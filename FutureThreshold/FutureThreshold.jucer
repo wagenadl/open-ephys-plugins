@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<JUCERPROJECT id="dq1ZAe" name="FutureThreshold" projectType="openephysplug"
+              version="1.0.0" bundleIdentifier="edu.caltech.cntc.FutureThreshold"
+              includeBinaryInAppConfig="1" buildOpenEphys="1" pluginName="FutureThreshold"
+              pluginDesc="FutureThreshold" pluginManufacturer="cntcdaw" pluginManufacturerCode="Manu"
+              pluginCode="Dq1z" openEphysPluginType="1" openEphysPluginProcessorType="1"
+              openEphysFileSourcePluginSupportedExtensions="" openEphysPluginDesiredWidth="200"
+              buildVST="0" buildVST3="0" jucerVersion="4.2.1" companyName="Caltech Neurotechnology Center / Daniel Wagenaar"
+              companyWebsite="cntc.caltech.edu" companyEmail="daw@caltech.edu"
+              defines="">
+  <MAINGROUP id="CDOP1Q" name="FutureThreshold">
+    <GROUP id="{BBCF95E3-26BE-15F8-999C-6E01022D2967}" name="Source">
+      <FILE id="kM46j7" name="OpenEphysLib.cpp" compile="1" resource="0"
+            file="Source/OpenEphysLib.cpp"/>
+      <FILE id="Q3iIgK" name="FutureThresholdProcessor.cpp" compile="1" resource="0"
+            file="Source/FutureThresholdProcessor.cpp"/>
+      <FILE id="w23pdl" name="FutureThresholdProcessor.h" compile="0" resource="0"
+            file="Source/FutureThresholdProcessor.h"/>
+      <FILE id="szPjnG" name="FutureThresholdProcessorEditor.cpp" compile="1"
+            resource="0" file="Source/FutureThresholdProcessorEditor.cpp"/>
+      <FILE id="Baags2" name="FutureThresholdProcessorEditor.h" compile="0"
+            resource="0" file="Source/FutureThresholdProcessorEditor.h"/>
+      <FILE id="moAgvA" name="FutureThresholdProcessorContentComponent.cpp"
+            compile="1" resource="0" file="Source/FutureThresholdProcessorContentComponent.cpp"/>
+      <FILE id="bhfnUU" name="FutureThresholdProcessorContentComponent.h"
+            compile="0" resource="0" file="Source/FutureThresholdProcessorContentComponent.h"/>
+    </GROUP>
+  </MAINGROUP>
+  <EXPORTFORMATS>
+    <VS2015 targetFolder="Builds/VisualStudio2015">
+      <CONFIGURATIONS>
+        <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="32-bit"
+                       isDebug="1" optimisation="1" targetName="NewProject"/>
+        <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="32-bit"
+                       isDebug="0" optimisation="3" targetName="NewProject"/>
+        <CONFIGURATION name="Debug64" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
+                       isDebug="1" optimisation="1" targetName="NewProject"/>
+        <CONFIGURATION name="Release64" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
+                       isDebug="0" optimisation="3" targetName="NewProject"/>
+      </CONFIGURATIONS>
+    </VS2015>
+    <VS2013 targetFolder="Builds/VisualStudio2013">
+      <CONFIGURATIONS>
+        <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="32-bit"
+                       isDebug="1" optimisation="1" targetName="NewProject"/>
+        <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="32-bit"
+                       isDebug="0" optimisation="3" targetName="NewProject"/>
+        <CONFIGURATION name="Debug64" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
+                       isDebug="1" optimisation="1" targetName="NewProject"/>
+        <CONFIGURATION name="Release64" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
+                       isDebug="0" optimisation="3" targetName="NewProject"/>
+      </CONFIGURATIONS>
+    </VS2013>
+    <LINUX_MAKE targetFolder="Builds/LinuxMakefile" extraDefs="JUCE_DISABLE_NATIVE_FILECHOOSERS=1"
+                cppLanguageStandard="-std=c++11" extraCompilerFlags="-I/home/wagenaar/progs/open-ephys/plugin-GUI/Plugins/Headers -I/home/wagenaar/progs/open-ephys/plugin-GUI/JuceLibraryCode -I/home/wagenaar/progs/open-ephys/plugin-GUI/JuceLibraryCode/modules">
+      <CONFIGURATIONS>
+        <CONFIGURATION name="Debug" libraryPath="/usr/X11R6/lib/" isDebug="1" optimisation="1"
+                       targetName="FutureThreshold" defines=""/>
+        <CONFIGURATION name="Release" libraryPath="/usr/X11R6/lib/" isDebug="0" optimisation="3"
+                       targetName="FutureThreshold" defines=""/>
+      </CONFIGURATIONS>
+    </LINUX_MAKE>
+  </EXPORTFORMATS>
+  <MODULES/>
+  <JUCEOPTIONS JUCE_QUICKTIME="disabled"/>
+  <OPENEPHYSPLUGIN>
+    <PARAMETER ID="0" NAME="adcChannel" TYPE="Discrete" DEFAULT_VALUE="0" HAS_CUSTOM_BOUNDS="0"
+               DESIRED_BOUNDS="0 0 0 0" POSSIBLE_VALUES="0" DESCRIPTION=""/>
+    <PARAMETER ID="1" NAME="eventChannel" TYPE="Discrete" DEFAULT_VALUE="0"
+               HAS_CUSTOM_BOUNDS="0" DESIRED_BOUNDS="0 0 0 0" POSSIBLE_VALUES="0"
+               DESCRIPTION=""/>
+    <PARAMETER ID="2" NAME="triggerThreshold" TYPE="Numerical" DEFAULT_VALUE="0"
+               HAS_CUSTOM_BOUNDS="0" DESIRED_BOUNDS="0 0 0 0" POSSIBLE_VALUES="-32767,32767"
+               DESCRIPTION=""/>
+    <PARAMETER ID="3" NAME="resetThreshold" TYPE="Numerical" DEFAULT_VALUE="0"
+               HAS_CUSTOM_BOUNDS="0" DESIRED_BOUNDS="0 0 0 0" POSSIBLE_VALUES="-32767,32767"
+               DESCRIPTION=""/>
+    <PARAMETER ID="4" NAME="delayMS" TYPE="Continuous" DEFAULT_VALUE="0" HAS_CUSTOM_BOUNDS="0"
+               DESIRED_BOUNDS="0 0 0 0" POSSIBLE_VALUES="0,100" DESCRIPTION=""/>
+  </OPENEPHYSPLUGIN>
+  <LIVE_SETTINGS>
+    <LINUX systemHeaderPath="/home/wagenaar/progs/open-ephys/plugin-GUI/Plugins/Headers"/>
+  </LIVE_SETTINGS>
+</JUCERPROJECT>
