@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<JUCERPROJECT id="kpvnSZ" name="SALPA" projectType="openephysplug" version="1.0.0"
+              bundleIdentifier="edu.caltech.cntc.SALPA" includeBinaryInAppConfig="1"
+              buildOpenEphys="1" pluginName="SALPA" pluginDesc="SALPA" pluginManufacturer="cntcdaw"
+              pluginManufacturerCode="Manu" pluginCode="Kpvn" openEphysPluginType="1"
+              openEphysPluginProcessorType="1" openEphysFileSourcePluginSupportedExtensions=""
+              openEphysPluginDesiredWidth="150" buildVST="0" buildVST3="0"
+              jucerVersion="4.2.1" companyName="Caltech Neurotechnology Center / Daniel Wagenaar"
+              companyWebsite="cntc.caltech.edu" companyEmail="daw@caltech.edu">
+  <MAINGROUP id="lIy2Yq" name="SALPA">
+    <GROUP id="{7560B0D5-E739-99F1-756D-8C11995ABF46}" name="Source">
+      <FILE id="srvAUY" name="OpenEphysLib.cpp" compile="1" resource="0"
+            file="Source/OpenEphysLib.cpp"/>
+      <FILE id="DGFRvL" name="SalpaProcessor.cpp" compile="1" resource="0"
+            file="Source/SalpaProcessor.cpp"/>
+      <FILE id="Edl2sh" name="SalpaProcessor.h" compile="0" resource="0"
+            file="Source/SalpaProcessor.h"/>
+      <FILE id="TvYPJ5" name="SalpaProcessorEditor.cpp" compile="1" resource="0"
+            file="Source/SalpaProcessorEditor.cpp"/>
+      <FILE id="kgXvHs" name="SalpaProcessorEditor.h" compile="0" resource="0"
+            file="Source/SalpaProcessorEditor.h"/>
+      <FILE id="I8Ll7y" name="SalpaProcessorContentComponent.cpp" compile="1"
+            resource="0" file="Source/SalpaProcessorContentComponent.cpp"/>
+      <FILE id="Nff7YC" name="SalpaProcessorContentComponent.h" compile="0"
+            resource="0" file="Source/SalpaProcessorContentComponent.h"/>
+      <FILE id="g1opVD" name="SalpaProcessorVisualizer.cpp" compile="1" resource="0"
+            file="Source/SalpaProcessorVisualizer.cpp"/>
+      <FILE id="JxrQwT" name="SalpaProcessorVisualizer.h" compile="0" resource="0"
+            file="Source/SalpaProcessorVisualizer.h"/>
+      <FILE id="kzfioG" name="SalpaProcessorVisualizerContentComponent.cpp"
+            compile="1" resource="0" file="Source/SalpaProcessorVisualizerContentComponent.cpp"/>
+      <FILE id="AYclSu" name="SalpaProcessorVisualizerContentComponent.h"
+            compile="0" resource="0" file="Source/SalpaProcessorVisualizerContentComponent.h"/>
+    </GROUP>
+  </MAINGROUP>
+  <EXPORTFORMATS>
+    <VS2015 targetFolder="Builds/VisualStudio2015">
+      <CONFIGURATIONS>
+        <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="32-bit"
+                       isDebug="1" optimisation="1" targetName="SALPA"/>
+        <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="32-bit"
+                       isDebug="0" optimisation="3" targetName="SALPA"/>
+        <CONFIGURATION name="Debug64" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
+                       isDebug="1" optimisation="1" targetName="SALPA"/>
+        <CONFIGURATION name="Release64" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
+                       isDebug="0" optimisation="3" targetName="SALPA"/>
+      </CONFIGURATIONS>
+    </VS2015>
+    <VS2013 targetFolder="Builds/VisualStudio2013">
+      <CONFIGURATIONS>
+        <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="32-bit"
+                       isDebug="1" optimisation="1" targetName="SALPA"/>
+        <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="32-bit"
+                       isDebug="0" optimisation="3" targetName="SALPA"/>
+        <CONFIGURATION name="Debug64" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
+                       isDebug="1" optimisation="1" targetName="SALPA"/>
+        <CONFIGURATION name="Release64" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
+                       isDebug="0" optimisation="3" targetName="SALPA"/>
+      </CONFIGURATIONS>
+    </VS2013>
+    <LINUX_MAKE targetFolder="Builds/LinuxMakefile">
+      <CONFIGURATIONS>
+        <CONFIGURATION name="Debug" libraryPath="/usr/X11R6/lib/" isDebug="1" optimisation="1"
+                       targetName="SALPA"/>
+        <CONFIGURATION name="Release" libraryPath="/usr/X11R6/lib/" isDebug="0" optimisation="3"
+                       targetName="SALPA"/>
+      </CONFIGURATIONS>
+    </LINUX_MAKE>
+  </EXPORTFORMATS>
+  <MODULES/>
+  <JUCEOPTIONS JUCE_QUICKTIME="disabled"/>
+  <OPENEPHYSPLUGIN>
+    <PARAMETER ID="0" NAME="negativeRail" TYPE="Continuous" DEFAULT_VALUE="-2000"
+               HAS_CUSTOM_BOUNDS="0" DESIRED_BOUNDS="0 0 0 0" POSSIBLE_VALUES="-32767,-1"
+               DESCRIPTION=""/>
+    <PARAMETER ID="1" NAME="positiveRail" TYPE="Continuous" DEFAULT_VALUE="2000"
+               HAS_CUSTOM_BOUNDS="0" DESIRED_BOUNDS="0 0 0 0" POSSIBLE_VALUES="1,32767"
+               DESCRIPTION=""/>
+    <PARAMETER ID="2" NAME="t_potblank" TYPE="Continuous" DEFAULT_VALUE="15"
+               HAS_CUSTOM_BOUNDS="0" DESIRED_BOUNDS="0 0 0 0" POSSIBLE_VALUES="1,100"
+               DESCRIPTION=""/>
+    <PARAMETER ID="3" NAME="t_blank" TYPE="Continuous" DEFAULT_VALUE="5" HAS_CUSTOM_BOUNDS="0"
+               DESIRED_BOUNDS="0 0 0 0" POSSIBLE_VALUES="1,100" DESCRIPTION=""/>
+    <PARAMETER ID="4" NAME="n_tooPoor" TYPE="Continuous" DEFAULT_VALUE="5" HAS_CUSTOM_BOUNDS="0"
+               DESIRED_BOUNDS="0 0 0 0" POSSIBLE_VALUES="0,100" DESCRIPTION=""/>
+    <PARAMETER ID="5" NAME="t_ahead" TYPE="Continuous" DEFAULT_VALUE="5" HAS_CUSTOM_BOUNDS="0"
+               DESIRED_BOUNDS="0 0 0 0" POSSIBLE_VALUES="0,100" DESCRIPTION=""/>
+    <PARAMETER ID="6" NAME="tau" TYPE="Continuous" DEFAULT_VALUE="30" HAS_CUSTOM_BOUNDS="0"
+               DESIRED_BOUNDS="0 0 0 0" POSSIBLE_VALUES="1,1000" DESCRIPTION=""/>
+    <PARAMETER ID="7" NAME="relThresh" TYPE="Continuous" DEFAULT_VALUE="3" HAS_CUSTOM_BOUNDS="0"
+               DESIRED_BOUNDS="0 0 0 0" POSSIBLE_VALUES="1,100" DESCRIPTION=""/>
+    <PARAMETER ID="8" NAME="pegValue" TYPE="Continuous" DEFAULT_VALUE="0" HAS_CUSTOM_BOUNDS="0"
+               DESIRED_BOUNDS="0 0 0 0" POSSIBLE_VALUES="-32767,32767" DESCRIPTION=""/>
+    <PARAMETER ID="9" NAME="pegOnEvent" TYPE="Discrete" DEFAULT_VALUE="-1" HAS_CUSTOM_BOUNDS="0"
+               DESIRED_BOUNDS="0 0 0 0" POSSIBLE_VALUES="-1" DESCRIPTION=""/>
+    <PARAMETER ID="10" NAME="absThresh" TYPE="Continuous" DEFAULT_VALUE="0"
+               HAS_CUSTOM_BOUNDS="0" DESIRED_BOUNDS="0 0 0 0" POSSIBLE_VALUES="0,32700"
+               DESCRIPTION=""/>
+    <PARAMETER ID="11" NAME="useAbsThresh" TYPE="Boolean" DEFAULT_VALUE="0"
+               HAS_CUSTOM_BOUNDS="0" DESIRED_BOUNDS="0 0 0 0" DESCRIPTION=""/>
+    <PARAMETER ID="12" NAME="t_asym" TYPE="Continuous" DEFAULT_VALUE="0" HAS_CUSTOM_BOUNDS="0"
+               DESIRED_BOUNDS="0 0 0 0" POSSIBLE_VALUES="0,1000" DESCRIPTION=""/>
+  </OPENEPHYSPLUGIN>
+  <LIVE_SETTINGS>
+    <LINUX/>
+  </LIVE_SETTINGS>
+</JUCERPROJECT>
