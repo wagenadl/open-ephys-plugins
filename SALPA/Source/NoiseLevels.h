@@ -44,7 +44,7 @@ public:
   void setnotready() {
     ready=false;
   }
-  void train(AudioSampleBuffer &buffer) {
+  void train(AudioSampleBuffer &buffer, int nSamples) {
     int nChannels = buffer.getNumChannels();
     if (nChannels != mv.size()) {
       mv.resize(nChannels);
@@ -52,9 +52,8 @@ public:
         mv[c].reset();
     }
     for (int c=0; c<nChannels; c++) {
-      int nSamples = getNumSamples(c);
-      float *samplePtr = buffer.getReadPointer(c, 0);
-      MedianVariance &mv1(mv[c]);
+      float const *samplePtr = buffer.getReadPointer(c, 0);
+      MedianVariance<double> &mv1(mv[c]);
       for (int i=0; i<nSamples; i++)
         mv1.addexample(samplePtr[i]);
     }
@@ -85,32 +84,6 @@ public:
       mv[hw].reset();
   }
   bool isready() const { return ready; }
-
-  void report() {
-    report("Means",means);
-    report("RMS",stds);
-    fprintf(stderr,"All values are digital units.\n");
-  }
-  void report(char const *label, float *data) {
-    fprintf(stderr,"%s:\n",label);
-    fprintf(stderr,"%4s","");
-    for (int col=0; col<8; col++)
-      fprintf(stderr,"%8i",col+1);
-    fprintf(stderr,"\n");
-    
-    for (int row=0; row<8; row++) {
-      fprintf(stderr,"%4i",row+1);
-      for (int col=0; col<8; col++) {
-	int hw = cr2hw(col,row);
-	string r = Sprintf("%.1f",data[hw]);
-	if (r.size()>7)
-	  r = r.substr(0,7);
-	fprintf(stderr,"%8s",r.c_str());
-      }
-      fprintf(stderr,"\n");
-    }
-  }
-
 private:
   std::vector<MedianVariance<double>> mv;
   std::vector<float> means;

@@ -22,7 +22,7 @@
 
 #define MEDIANVARIANCE_H
 
-#include <base/Variance.H>
+#include "Variance.h"
 
 #include <algorithm>
 #include <vector>
@@ -33,10 +33,10 @@
 
 template <class D> class MedianVariance {
 public:
-  constexpr int PERCENTILE = 25;
-  constexpr int FREQ_KHZ = 30; // total guess
-  constexpr int CHUNKLEN_MS = 10;
-  constexpr int CHUNKSIZE = CHUNKLEN_MS * FREQ_KHZ;
+  static constexpr int PERCENTILE = 25;
+  static constexpr int FREQ_KHZ = 30; // total guess
+  static constexpr int CHUNKLEN_MS = 10;
+  static constexpr int CHUNKSIZE = CHUNKLEN_MS * FREQ_KHZ;
 public:
   MedianVariance(D first=0, int chunksize0=CHUNKSIZE):
     col(first), chunksize(chunksize0) { }
@@ -58,14 +58,14 @@ public:
   D mean() { // actually: median of means
     int n=means.size()*50/100;
     if (n==0) return 0;
-    typename vector<D>::iterator i=means.begin()+n;
+    auto i=means.begin()+n;
     nth_element(means.begin(),i,means.end());
     return *i;
   }
   D var() { // actually: PERCENTILE of vars
     int n=vars.size()*PERCENTILE/100;
     if (n==0) return 0;
-    typename vector<D>::iterator i=vars.begin()+n;
+    auto i=vars.begin()+n;
     nth_element(vars.begin(),i,vars.end());
     return *i;
   }
@@ -79,8 +79,8 @@ public:
 #endif
 private:
   Variance<D> col;
-  vector<D> means;
-  vector<D> vars;
+  std::vector<D> means;
+  std::vector<D> vars;
   int chunksize;
   int i;
 };

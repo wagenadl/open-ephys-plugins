@@ -28,11 +28,23 @@
 #include "SalpaProcessorEditor.h"
 #include "LocalFit.h"
 
-const int TRAINLENGTH = FREQKHZ*5000;
+const int FREQKHZ = 30; // whatever
+const int TRAINCHUNKS = 20;
+const int LOGBUFSIZE = 12; // BUFSIZE = 1<<12 = 4096 samples
 
-
-
-SalpaProcessor::SalpaProcessor(): GenericProcessor("SALPA") {
+SalpaProcessor::SalpaProcessor(): GenericProcessor("SALPA"),
+                                  v_zero(0),
+                                  v_neg_rail(-4000), v_pos_rail(4000),
+                                  n_toopoor(5),
+                                  tau(20),
+                                  t_ahead(5),
+                                  t_blankdur(5),
+                                  t_potblank(5),
+                                  t_asym(15),
+                                  absthr(0),
+                                  relthr(3),
+                                  eventchannel(-1),
+                                  delay(0) {
   setProcessorType (PROCESSOR_TYPE_FILTER);
 
   // Open Ephys Plugin Generator will insert generated code for parameters here. Don't edit this section.
@@ -51,16 +63,14 @@ SalpaProcessor::~SalpaProcessor() {
    If the processor uses a custom editor, this method must be present.
 */
 AudioProcessorEditor* SalpaProcessor::createEditor() {
-  editor = new SalpaProcessorEditor (this, true);
-
-  //std::cout << "Creating editor." << std::endl;
-
+  editor = new SalpaProcessorEditor(this, false);
   return editor;
 }
 
 void SalpaProcessor::setParameter(int idx, float val) {
-  GenericProcessor::setParameter(idx, val);
-  editor->updateParameterButtons(idx, val);
+  printf("salpa set param %i %g\n", idx, val);
+  //  GenericProcessor::setParameter(idx, val);
+  editor->updateParameterButtons(idx);
   switch (idx) {
   case PARAM_V_ZERO:
     v_zero = val;
@@ -106,12 +116,18 @@ void SalpaProcessor::setParameter(int idx, float val) {
 }
 
 void SalpaProcessor::train(AudioSampleBuffer &buffer) {
-  noise.train(buffer);
+  printf("SALPA: train\n");
+  noise.train(buffer, getNumSamples(0));
   if (noise.chunks() >= TRAINCHUNKS) {
+    printf("SALPA: done training\n");
     noise.makeready();
+    for (int n=0; n<fitters.size(); n++)
+      printf("noise[%i] = %g\n", n, noise.std(n));
     if (!useabsthr) 
       for (int n=0; n<fitters.size(); n++)
         fitters[n]->setthreshold(relthr * noise.std(n));
+  } else {
+    printf("SALPA: more training required (%i)\n", noise.chunks());
   }
 }
 
@@ -120,32 +136,62 @@ void SalpaProcessor::forgetTraining() {
 }
 
 void SalpaProcessor::dropFitters() {
-  for (auto f: fitters):
+  for (auto f: fitters)
     delete f;
+  for (auto b: inbufs)
+    delete b;
+  for (auto b: outbufs)
+    delete b;
 }   
  
 void SalpaProcessor::createFitters(int nChannels) {
   dropFitters();
   fitters.resize(nChannels);
+  inbufs.resize(nChannels);
+  outbufs.resize(nChannels);
+  delay = 0;
   for (int c=0; c<nChannels; c++) {
-    fitters[c] = new LocalFit(tau, t_blankdur, t_ahead, t_asym);
+    inbufs[c] = new CyclBuf<raw_t>(LOGBUFSIZE);
+    outbufs[c] = new CyclBuf<raw_t>(LOGBUFSIZE);
+    fitters[c] = new LocalFit(*inbufs[c], *outbufs[c],
+                              0, 0, tau,
+                              t_blankdur, t_ahead,
+                              t_asym);
     fitters[c]->setrail(v_neg_rail, v_pos_rail);
     fitters[c]->setthreshold(useabsthr ? absthr : relthr * noise.std(c));
+    delay = fitters[c]->requireddelay(); // will be all the same
+  }
 }
 
 void SalpaProcessor::process(AudioSampleBuffer &buffer) {
+  printf("SALPA: process\n");
   if (!noise.isready())
     train(buffer);
-  
+
   int nChannels = buffer.getNumChannels();
-  if (nChannels != fitters.size())
-    createFitters();
+  if (nChannels != fitters.size()) {
+    createFitters(nChannels);
+    // this must be the first part of the run
+    for (int c=0; c<nChannels; c++)
+      outbufs[c]->fill(v_zero);
+    fitters[0]->inirep();
+  }
   
   for (int c=0; c<nChannels; c++) {
     int nSamples = getNumSamples(c);
     float *samplePtr = buffer.getWritePointer(c, 0);
-    fitters[c]->process(samplePtr, nSamples);
+    CyclBuf<raw_t> &inbuf(*inbufs[c]);
+    timeref_t t0 = inbuf.latest();
+    for (int n=0; n<nSamples; n++)
+      inbuf[t0+n] = samplePtr[n];
+    inbuf.donewriting(nSamples);
+    if (inbuf.latest() > delay) 
+      fitters[c]->process(inbuf.latest() - delay);
+    CyclBuf<raw_t> &outbuf(*outbufs[c]);
+    for (int n=0; n<nSamples; n++)
+      samplePtr[n] = outbuf[t0 - delay + n];
   }
+  fitters[0]->report();
 }
 
 void SalpaProcessor::saveCustomParametersToXml (XmlElement* parentElement) {

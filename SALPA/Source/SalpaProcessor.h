@@ -2,6 +2,7 @@
     ------------------------------------------------------------------
 
     This file is part of the Open Ephys GUI
+    Copyright (C) 2020 Daniel Wagenaar
     Copyright (C) 2016 Open Ephys
 
     ------------------------------------------------------------------
@@ -30,6 +31,8 @@
 
 #include <ProcessorHeaders.h>
 #include "NoiseLevels.h"
+#include "LocalFit.h"
+#include "CyclBuf.h"
 
 /**
     This class serves as a template for creating new processors.
@@ -40,20 +43,21 @@
     @see GenericProcessor
 */
 class SalpaProcessor : public GenericProcessor {
-  enum {
-    PARAM_V_ZERO,
-    PARAM_V_NEG_RAIL,
-    PARAM_V_POS_RAIL,
-    PARAM_N_TOOPOOR,
-    PARAM_TAU,
-    PARAM_T_AHEAD,
-    PARAM_T_BLANKDUR,
-    PARAM_T_POTBLANK,
-    PARAM_T_ASYM,
-    PARAM_ABSTHR,
-    PARAM_RELTHR,
-    PARAM_USEABSTHR,
-    PARAM_EVENTCHANNEL,
+public:
+  enum { // must match jucer
+    PARAM_V_NEG_RAIL=0,
+    PARAM_V_POS_RAIL=1,
+    PARAM_T_POTBLANK=2,
+    PARAM_T_BLANKDUR=3,
+    PARAM_N_TOOPOOR=4,
+    PARAM_T_AHEAD=5,
+    PARAM_TAU=6,
+    PARAM_RELTHR=7,
+    PARAM_ABSTHR=8,
+    PARAM_USEABSTHR=9,
+    PARAM_T_ASYM=10,
+    PARAM_EVENTCHANNEL=11,
+    PARAM_V_ZERO=12,
   };
 public:
   SalpaProcessor();
@@ -66,6 +70,7 @@ public:
   virtual void saveCustomParametersToXml(XmlElement *parentElement) override;
   virtual void loadCustomParametersFromXml() override;
 private:
+  friend class SalpaProcessorEditor;
   // parameters
   raw_t v_zero;
   raw_t v_neg_rail, v_pos_rail;
@@ -77,8 +82,11 @@ private:
   bool useabsthr;
   int eventchannel;
   // helpers
-  std::vector<class LocalFit *> fitters;
+  std::vector<LocalFit *> fitters;
+  std::vector<CyclBuf<raw_t> *> inbufs;
+  std::vector<CyclBuf<raw_t> *> outbufs;
   NoiseLevels noise;
+  int delay;
 private:
   void createFitters(int nChannels);
   void dropFitters();

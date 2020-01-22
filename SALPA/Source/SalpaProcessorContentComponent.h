@@ -60,7 +60,7 @@ private:
     // Make an editor to be friendly class of this content component,
     // so the editor will have access to all methods and variables of this component.
     friend class SalpaProcessorEditor;
-
+  class SalpaProcessor *processor;
     //[/UserVariables]
 
     //==============================================================================
@@ -69,8 +69,8 @@ private:
     ScopedPointer<Label> label3;
     ScopedPointer<Label> labl2;
     ScopedPointer<Slider> tau;
-    ScopedPointer<Slider> theta;
-    ScopedPointer<Slider> theta2;
+    ScopedPointer<Slider> relthr;
+    ScopedPointer<Slider> lookahead;
     ScopedPointer<ComboBox> eventChannel;
 
 

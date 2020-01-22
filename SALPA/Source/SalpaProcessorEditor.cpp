@@ -27,9 +27,9 @@
 static const int EDITOR_DESIRED_WIDTH = 150;
 
 
-SalpaProcessorEditor::SalpaProcessorEditor (GenericProcessor* parentNode, bool useDefaultParameterEditors = true)
-    : VisualizerEditor (parentNode, useDefaultParameterEditors)
-{
+SalpaProcessorEditor::SalpaProcessorEditor(SalpaProcessor* parentNode,
+                                           bool useDefaultParameterEditors):
+  VisualizerEditor(parentNode, useDefaultParameterEditors) {
     tabText = "SALPA";
 
     // Open Ephys Plugin Generator will insert generated code for editor here. Don't edit this section.
@@ -43,7 +43,19 @@ SalpaProcessorEditor::SalpaProcessorEditor (GenericProcessor* parentNode, bool u
 
     //[OPENEPHYS_EDITOR_PRE_CONSTRUCTOR_SECTION_END]
 
+    content.processor = parentNode;
 
+    content.relthr->setValue(parentNode->relthr);
+    content.tau->setValue(parentNode->tau);
+    content.lookahead->setValue(parentNode->t_ahead);
+    if (parentNode->eventchannel>=0)
+      content.eventChannel->setText(String(parentNode->eventchannel + 1));
+    else
+      content.eventChannel->setText("-");
+
+    // should fill visualizer as well
+    
+    
     ////Most used buttons are UtilityButton, which shows a simple button with text and ElectrodeButton, which is an on-off button which displays a channel.
     //exampleButton = new UtilityButton ("Button text", Font ("Default", 15, Font::plain));
     //exampleButton->setBounds (10, 30, 50, 50); //Set position and size (X, Y, XSize, YSize)

@@ -41,7 +41,8 @@ class SalpaProcessorEditor : public VisualizerEditor
 {
 public:
     /** The class constructor, used to initialize any members. */
-    SalpaProcessorEditor (GenericProcessor* parentNode, bool useDefaultParameterEditors);
+    SalpaProcessorEditor (SalpaProcessor* parentNode,
+                          bool useDefaultParameterEditors);
 
     /** The class destructor, used to deallocate memory */
     ~SalpaProcessorEditor();

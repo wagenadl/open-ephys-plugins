@@ -18,6 +18,7 @@
 */
 
 //[Headers] You can add your own extra header files here...
+#include "SalpaProcessor.h"
 //[/Headers]
 
 #include "SalpaProcessorContentComponent.h"
@@ -30,6 +31,7 @@
 SalpaProcessorContentComponent::SalpaProcessorContentComponent ()
 {
     //[Constructor_pre] You can add your own custom stuff here..
+  processor = 0;
     //[/Constructor_pre]
 
     addAndMakeVisible (label = new Label ("new label",
@@ -75,19 +77,19 @@ SalpaProcessorContentComponent::SalpaProcessorContentComponent ()
     tau->setTextBoxStyle (Slider::TextBoxLeft, false, 35, 20);
     tau->addListener (this);
 
-    addAndMakeVisible (theta = new Slider ("theta"));
-    theta->setTooltip (TRANS("Threshold for depegging (units of RMS noise)\n"));
-    theta->setRange (1, 20, 0.1);
-    theta->setSliderStyle (Slider::IncDecButtons);
-    theta->setTextBoxStyle (Slider::TextBoxLeft, false, 35, 20);
-    theta->addListener (this);
+    addAndMakeVisible (relthr = new Slider ("relthr"));
+    relthr->setTooltip (TRANS("Threshold for depegging (units of RMS noise)\n"));
+    relthr->setRange (1, 20, 0.1);
+    relthr->setSliderStyle (Slider::IncDecButtons);
+    relthr->setTextBoxStyle (Slider::TextBoxLeft, false, 35, 20);
+    relthr->addListener (this);
 
-    addAndMakeVisible (theta2 = new Slider ("theta"));
-    theta2->setTooltip (TRANS("Look ahead (samples)\n"));
-    theta2->setRange (1, 200, 1);
-    theta2->setSliderStyle (Slider::IncDecButtons);
-    theta2->setTextBoxStyle (Slider::TextBoxLeft, false, 35, 20);
-    theta2->addListener (this);
+    addAndMakeVisible (lookahead = new Slider ("lookahead"));
+    lookahead->setTooltip (TRANS("Look ahead (samples)\n"));
+    lookahead->setRange (1, 200, 1);
+    lookahead->setSliderStyle (Slider::IncDecButtons);
+    lookahead->setTextBoxStyle (Slider::TextBoxLeft, false, 35, 20);
+    lookahead->addListener (this);
 
     addAndMakeVisible (eventChannel = new ComboBox ("eventChannel"));
     eventChannel->setTooltip (TRANS("Event channel for forced peg\n"
@@ -128,8 +130,8 @@ SalpaProcessorContentComponent::~SalpaProcessorContentComponent()
     label3 = nullptr;
     labl2 = nullptr;
     tau = nullptr;
-    theta = nullptr;
-    theta2 = nullptr;
+    relthr = nullptr;
+    lookahead = nullptr;
     eventChannel = nullptr;
 
 
@@ -157,8 +159,8 @@ void SalpaProcessorContentComponent::resized()
     label3->setBounds (0, proportionOfHeight (0.5000f), proportionOfWidth (0.5000f), 24);
     labl2->setBounds (0, proportionOfHeight (0.7500f), proportionOfWidth (0.5000f), 24);
     tau->setBounds (proportionOfWidth (1.0000f) - proportionOfWidth (0.5000f), proportionOfHeight (0.0200f), proportionOfWidth (0.5000f), 20);
-    theta->setBounds (proportionOfWidth (1.0000f) - proportionOfWidth (0.5000f), proportionOfHeight (0.2700f), proportionOfWidth (0.5000f), 20);
-    theta2->setBounds (proportionOfWidth (1.0000f) - proportionOfWidth (0.5000f), proportionOfHeight (0.5200f), proportionOfWidth (0.5000f), 20);
+    relthr->setBounds (proportionOfWidth (1.0000f) - proportionOfWidth (0.5000f), proportionOfHeight (0.2700f), proportionOfWidth (0.5000f), 20);
+    lookahead->setBounds (proportionOfWidth (1.0000f) - proportionOfWidth (0.5000f), proportionOfHeight (0.5200f), proportionOfWidth (0.5000f), 20);
     eventChannel->setBounds (proportionOfWidth (1.0000f) - proportionOfWidth (0.5000f), proportionOfHeight (0.7700f), proportionOfWidth (0.5000f), 20);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
@@ -172,17 +174,26 @@ void SalpaProcessorContentComponent::sliderValueChanged (Slider* sliderThatWasMo
     if (sliderThatWasMoved == tau)
     {
         //[UserSliderCode_tau] -- add your slider handling code here..
+      if (processor)
+        processor->setParameter(SalpaProcessor::PARAM_TAU,
+                                sliderThatWasMoved->getValue());
         //[/UserSliderCode_tau]
     }
-    else if (sliderThatWasMoved == theta)
+    else if (sliderThatWasMoved == relthr)
     {
-        //[UserSliderCode_theta] -- add your slider handling code here..
-        //[/UserSliderCode_theta]
+        //[UserSliderCode_relthr] -- add your slider handling code here..
+      if (processor)
+        processor->setParameter(SalpaProcessor::PARAM_RELTHR,
+                                sliderThatWasMoved->getValue());
+        //[/UserSliderCode_relthr]
     }
-    else if (sliderThatWasMoved == theta2)
+    else if (sliderThatWasMoved == lookahead)
     {
-        //[UserSliderCode_theta2] -- add your slider handling code here..
-        //[/UserSliderCode_theta2]
+        //[UserSliderCode_lookahead] -- add your slider handling code here..
+      if (processor)
+        processor->setParameter(SalpaProcessor::PARAM_T_AHEAD,
+                                sliderThatWasMoved->getValue());
+        //[/UserSliderCode_lookahead]
     }
 
     //[UsersliderValueChanged_Post]
@@ -249,16 +260,16 @@ BEGIN_JUCER_METADATA
           min="1" max="1000" int="1" style="IncDecButtons" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="35" textBoxHeight="20" skewFactor="1"
           needsCallback="1"/>
-  <SLIDER name="theta" id="439f63233ceb3c43" memberName="theta" virtualName=""
+  <SLIDER name="relthr" id="439f63233ceb3c43" memberName="relthr" virtualName=""
           explicitFocusOrder="0" pos="100%r 27% 50% 20" tooltip="Threshold for depegging (units of RMS noise)&#10;"
           min="1" max="20" int="0.10000000000000000555" style="IncDecButtons"
           textBoxPos="TextBoxLeft" textBoxEditable="1" textBoxWidth="35"
           textBoxHeight="20" skewFactor="1" needsCallback="1"/>
-  <SLIDER name="theta" id="f5f599cd96784081" memberName="theta2" virtualName=""
-          explicitFocusOrder="0" pos="100%r 52% 50% 20" tooltip="Look ahead (samples)&#10;"
-          min="1" max="200" int="1" style="IncDecButtons" textBoxPos="TextBoxLeft"
-          textBoxEditable="1" textBoxWidth="35" textBoxHeight="20" skewFactor="1"
-          needsCallback="1"/>
+  <SLIDER name="lookahead" id="f5f599cd96784081" memberName="lookahead"
+          virtualName="" explicitFocusOrder="0" pos="100%r 52% 50% 20"
+          tooltip="Look ahead (samples)&#10;" min="1" max="200" int="1"
+          style="IncDecButtons" textBoxPos="TextBoxLeft" textBoxEditable="1"
+          textBoxWidth="35" textBoxHeight="20" skewFactor="1" needsCallback="1"/>
   <COMBOBOX name="eventChannel" id="2155ac33a250d3db" memberName="eventChannel"
             virtualName="" explicitFocusOrder="0" pos="100%r 77% 50% 20"
             tooltip="Event channel for forced peg&#10;&#10;" editable="0"

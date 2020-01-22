@@ -22,8 +22,6 @@
 
 #define LOCALFIT_H
 
-#include <math.h>
-
 /* Notice: BIG WARNING: For large tau, the sums X3 and X1 become very
    large after multiplication with T4 and T6, especially if the signal
    isn't centered at zero initially. This is problematic from tau>=55 if
@@ -33,7 +31,9 @@
    X1..X3.
 */
 
+// following required for Target only, apart from timeref_t and raw_t
 #include "Types.h"
+#include "CyclBuf.h"
 
 class LocalFit {
 public:
@@ -52,14 +52,26 @@ public:
      *: t_0 is implicitly equal to t_stream and not kept
      +: t_0 is used to mark end of forced peg
   */
-  typedef double int_t; // was "long long"...
+  static constexpr raw_t RAIL1=0;
+  static constexpr raw_t RAIL2=4095;
+  static constexpr timeref_t TCHI2=15; // samples
+  static constexpr timeref_t BLANKDEP=5; // samples
+  static constexpr timeref_t AHEAD=5; // samples
+  static constexpr timeref_t TOOPOORCNT=5;
+  typedef double int_t;
+  //  typedef long long int_t;
+  typedef double real_t;
 public: 
-  LocalFit(int tau, int t_blankdepeg, int t_ahead, int t_chi2);
-  void reset(timeref_t t_start=0);
-  void setrail(raw_t r1, raw_t r2) { rail1=r1; rail2=r2; }
-  void setthreshold(raw_t threshold);
-  timeref_t process(raw_t *buffer, int n);
+  LocalFit(CyclBuf<raw_t> const &source, CyclBuf<raw_t> &dest,
+	   timeref_t t_start, raw_t threshold, timeref_t tau,
+	   timeref_t t_blankdepeg=BLANKDEP, timeref_t t_ahead=AHEAD,
+	   timeref_t t_chi2=TCHI2);
+  void reset(timeref_t t_start);
+  void setrail(raw_t r1, raw_t r2);
+  void setthreshold(raw_t thr);
+  timeref_t process(timeref_t t_limit);
   timeref_t forcepeg(timeref_t t_from, timeref_t t_to);
+  int requireddelay() const;
 private:
   void init_T();
   void calc_X012(); // at t0
@@ -72,8 +84,8 @@ private:
   bool ispegged(raw_t value) { return value==rail1 || value==rail2; }
 private:
   // external world communication
-  raw_t const *source;
-  raw_t *dest;
+  CyclBuf<raw_t> const &source;
+  CyclBuf<raw_t> &dest;
 private:
   // externally imposed constants
   raw_t y_threshold;
@@ -96,8 +108,7 @@ private:
   // state variables
   State state;
   timeref_t t_stream, t0;
-  timeref_t t_end;
-  real_t X0, X1, X2, X3;
+  int_t X0, X1, X2, X3;
   real_t alpha0, alpha1, alpha2, alpha3;
   int toopoorcnt;
   bool negv;

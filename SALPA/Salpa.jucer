@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="kpvnSZ" name="SALPA" projectType="openephysplug" version="1.0.0"
-              bundleIdentifier="edu.caltech.cntc.SALPA" includeBinaryInAppConfig="1"
-              buildOpenEphys="1" pluginName="SALPA" pluginDesc="SALPA" pluginManufacturer="cntcdaw"
+<JUCERPROJECT id="kpvnSZ" name="Salpa" projectType="openephysplug" version="1.0.0"
+              bundleIdentifier="edu.caltech.cntc.Salpa" includeBinaryInAppConfig="1"
+              buildOpenEphys="1" pluginName="Salpa" pluginDesc="Salpa" pluginManufacturer="cntcdaw"
               pluginManufacturerCode="Manu" pluginCode="Kpvn" openEphysPluginType="1"
               openEphysPluginProcessorType="1" openEphysFileSourcePluginSupportedExtensions=""
               openEphysPluginDesiredWidth="150" buildVST="0" buildVST3="0"
               jucerVersion="4.2.1" companyName="Caltech Neurotechnology Center / Daniel Wagenaar"
               companyWebsite="cntc.caltech.edu" companyEmail="daw@caltech.edu">
-  <MAINGROUP id="lIy2Yq" name="SALPA">
+  <MAINGROUP id="lIy2Yq" name="Salpa">
     <GROUP id="{7560B0D5-E739-99F1-756D-8C11995ABF46}" name="Source">
       <FILE id="srvAUY" name="OpenEphysLib.cpp" compile="1" resource="0"
             file="Source/OpenEphysLib.cpp"/>
@@ -38,42 +38,43 @@
     <VS2015 targetFolder="Builds/VisualStudio2015">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="32-bit"
-                       isDebug="1" optimisation="1" targetName="SALPA"/>
+                       isDebug="1" optimisation="1" targetName="Salpa"/>
         <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="32-bit"
-                       isDebug="0" optimisation="3" targetName="SALPA"/>
+                       isDebug="0" optimisation="3" targetName="Salpa"/>
         <CONFIGURATION name="Debug64" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
-                       isDebug="1" optimisation="1" targetName="SALPA"/>
+                       isDebug="1" optimisation="1" targetName="Salpa"/>
         <CONFIGURATION name="Release64" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
-                       isDebug="0" optimisation="3" targetName="SALPA"/>
+                       isDebug="0" optimisation="3" targetName="Salpa"/>
       </CONFIGURATIONS>
     </VS2015>
     <VS2013 targetFolder="Builds/VisualStudio2013">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="32-bit"
-                       isDebug="1" optimisation="1" targetName="SALPA"/>
+                       isDebug="1" optimisation="1" targetName="Salpa"/>
         <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="32-bit"
-                       isDebug="0" optimisation="3" targetName="SALPA"/>
+                       isDebug="0" optimisation="3" targetName="Salpa"/>
         <CONFIGURATION name="Debug64" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
-                       isDebug="1" optimisation="1" targetName="SALPA"/>
+                       isDebug="1" optimisation="1" targetName="Salpa"/>
         <CONFIGURATION name="Release64" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
-                       isDebug="0" optimisation="3" targetName="SALPA"/>
+                       isDebug="0" optimisation="3" targetName="Salpa"/>
       </CONFIGURATIONS>
     </VS2013>
-    <LINUX_MAKE targetFolder="Builds/LinuxMakefile">
+    <LINUX_MAKE targetFolder="Builds/LinuxMakefile" extraDefs="JUCE_DISABLE_NATIVE_FILECHOOSERS=1"
+                cppLanguageStandard="-std=c++11" extraCompilerFlags="-I/home/wagenaar/progs/open-ephys/plugin-GUI/Plugins/Headers -I/home/wagenaar/progs/open-ephys/plugin-GUI/JuceLibraryCode -I/home/wagenaar/progs/open-ephys/plugin-GUI/JuceLibraryCode/modules">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" libraryPath="/usr/X11R6/lib/" isDebug="1" optimisation="1"
-                       targetName="SALPA"/>
+                       targetName="Salpa"/>
         <CONFIGURATION name="Release" libraryPath="/usr/X11R6/lib/" isDebug="0" optimisation="3"
-                       targetName="SALPA"/>
+                       targetName="Salpa"/>
       </CONFIGURATIONS>
     </LINUX_MAKE>
   </EXPORTFORMATS>
   <MODULES/>
   <JUCEOPTIONS JUCE_QUICKTIME="disabled"/>
   <OPENEPHYSPLUGIN>
-    <PARAMETER ID="0" NAME="negativeRail" TYPE="Continuous" DEFAULT_VALUE="-2000"
+    <PARAMETER ID="0" NAME="negativeRail" TYPE="Continuous" DEFAULT_VALUE="-3000"
                HAS_CUSTOM_BOUNDS="0" DESIRED_BOUNDS="0 0 0 0" POSSIBLE_VALUES="-32767,-1"
-               DESCRIPTION=""/>
+               DESCRIPTION="Negative rail&#10;"/>
     <PARAMETER ID="1" NAME="positiveRail" TYPE="Continuous" DEFAULT_VALUE="2000"
                HAS_CUSTOM_BOUNDS="0" DESIRED_BOUNDS="0 0 0 0" POSSIBLE_VALUES="1,32767"
                DESCRIPTION=""/>
@@ -90,17 +91,17 @@
                DESIRED_BOUNDS="0 0 0 0" POSSIBLE_VALUES="1,1000" DESCRIPTION=""/>
     <PARAMETER ID="7" NAME="relThresh" TYPE="Continuous" DEFAULT_VALUE="3" HAS_CUSTOM_BOUNDS="0"
                DESIRED_BOUNDS="0 0 0 0" POSSIBLE_VALUES="1,100" DESCRIPTION=""/>
-    <PARAMETER ID="8" NAME="pegValue" TYPE="Continuous" DEFAULT_VALUE="0" HAS_CUSTOM_BOUNDS="0"
-               DESIRED_BOUNDS="0 0 0 0" POSSIBLE_VALUES="-32767,32767" DESCRIPTION=""/>
-    <PARAMETER ID="9" NAME="pegOnEvent" TYPE="Discrete" DEFAULT_VALUE="-1" HAS_CUSTOM_BOUNDS="0"
-               DESIRED_BOUNDS="0 0 0 0" POSSIBLE_VALUES="-1" DESCRIPTION=""/>
-    <PARAMETER ID="10" NAME="absThresh" TYPE="Continuous" DEFAULT_VALUE="0"
-               HAS_CUSTOM_BOUNDS="0" DESIRED_BOUNDS="0 0 0 0" POSSIBLE_VALUES="0,32700"
-               DESCRIPTION=""/>
-    <PARAMETER ID="11" NAME="useAbsThresh" TYPE="Boolean" DEFAULT_VALUE="0"
-               HAS_CUSTOM_BOUNDS="0" DESIRED_BOUNDS="0 0 0 0" DESCRIPTION=""/>
-    <PARAMETER ID="12" NAME="t_asym" TYPE="Continuous" DEFAULT_VALUE="0" HAS_CUSTOM_BOUNDS="0"
+    <PARAMETER ID="8" NAME="absThresh" TYPE="Continuous" DEFAULT_VALUE="0" HAS_CUSTOM_BOUNDS="0"
+               DESIRED_BOUNDS="0 0 0 0" POSSIBLE_VALUES="0,32700" DESCRIPTION=""/>
+    <PARAMETER ID="9" NAME="useAbsThresh" TYPE="Boolean" DEFAULT_VALUE="0" HAS_CUSTOM_BOUNDS="0"
+               DESIRED_BOUNDS="0 0 0 0" DESCRIPTION=""/>
+    <PARAMETER ID="10" NAME="t_asym" TYPE="Continuous" DEFAULT_VALUE="0" HAS_CUSTOM_BOUNDS="0"
                DESIRED_BOUNDS="0 0 0 0" POSSIBLE_VALUES="0,1000" DESCRIPTION=""/>
+    <PARAMETER ID="11" NAME="eventChannel" TYPE="Numerical" DEFAULT_VALUE="0"
+               HAS_CUSTOM_BOUNDS="0" DESIRED_BOUNDS="0 0 0 0" POSSIBLE_VALUES="-1,7"
+               DESCRIPTION=""/>
+    <PARAMETER ID="12" NAME="v_zero" TYPE="Continuous" DEFAULT_VALUE="0" HAS_CUSTOM_BOUNDS="0"
+               DESIRED_BOUNDS="0 0 0 0" POSSIBLE_VALUES="-32700,32700" DESCRIPTION=""/>
   </OPENEPHYSPLUGIN>
   <LIVE_SETTINGS>
     <LINUX/>
