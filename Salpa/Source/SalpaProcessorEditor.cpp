@@ -54,8 +54,8 @@ SalpaProcessorEditor::SalpaProcessorEditor(SalpaProcessor* parentNode,
       content.eventChannel->setText("-");
 
     // should fill visualizer as well
-    
-    
+
+
     ////Most used buttons are UtilityButton, which shows a simple button with text and ElectrodeButton, which is an on-off button which displays a channel.
     //exampleButton = new UtilityButton ("Button text", Font ("Default", 15, Font::plain));
     //exampleButton->setBounds (10, 30, 50, 50); //Set position and size (X, Y, XSize, YSize)

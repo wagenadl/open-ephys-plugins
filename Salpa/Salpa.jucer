@@ -74,7 +74,7 @@
   <OPENEPHYSPLUGIN>
     <PARAMETER ID="0" NAME="negativeRail" TYPE="Continuous" DEFAULT_VALUE="-3000"
                HAS_CUSTOM_BOUNDS="0" DESIRED_BOUNDS="0 0 0 0" POSSIBLE_VALUES="-32767,-1"
-               DESCRIPTION="Negative rail&#10;"/>
+               DESCRIPTION=""/>
     <PARAMETER ID="1" NAME="positiveRail" TYPE="Continuous" DEFAULT_VALUE="2000"
                HAS_CUSTOM_BOUNDS="0" DESIRED_BOUNDS="0 0 0 0" POSSIBLE_VALUES="1,32767"
                DESCRIPTION=""/>

@@ -49,6 +49,59 @@ SalpaProcessor::SalpaProcessor(): GenericProcessor("SALPA"),
 
   // Open Ephys Plugin Generator will insert generated code for parameters here. Don't edit this section.
   //[OPENEPHYS_PARAMETERS_SECTION_BEGIN]
+    // Parameter 0 code
+    auto parameter0 = new Parameter ("negativeRail", -32767, -1, -3000, 0);
+    parameters.add (parameter0);
+
+    // Parameter 1 code
+    auto parameter1 = new Parameter ("positiveRail", 1, 32767, 2000, 1);
+    parameters.add (parameter1);
+
+    // Parameter 2 code
+    auto parameter2 = new Parameter ("t_potblank", 1, 100, 15, 2);
+    parameters.add (parameter2);
+
+    // Parameter 3 code
+    auto parameter3 = new Parameter ("t_blank", 1, 100, 5, 3);
+    parameters.add (parameter3);
+
+    // Parameter 4 code
+    auto parameter4 = new Parameter ("n_tooPoor", 0, 100, 5, 4);
+    parameters.add (parameter4);
+
+    // Parameter 5 code
+    auto parameter5 = new Parameter ("t_ahead", 0, 100, 5, 5);
+    parameters.add (parameter5);
+
+    // Parameter 6 code
+    auto parameter6 = new Parameter ("tau", 1, 1000, 30, 6);
+    parameters.add (parameter6);
+
+    // Parameter 7 code
+    auto parameter7 = new Parameter ("relThresh", 1, 100, 3, 7);
+    parameters.add (parameter7);
+
+    // Parameter 8 code
+    auto parameter8 = new Parameter ("absThresh", 0, 32700, 0, 8);
+    parameters.add (parameter8);
+
+    // Parameter 9 code
+    auto parameter9 = new Parameter ("useAbsThresh", false, 9);
+    parameters.add (parameter9);
+
+    // Parameter 10 code
+    auto parameter10 = new Parameter ("t_asym", 0, 1000, 0, 10);
+    parameters.add (parameter10);
+
+    // Parameter 11 code
+    auto parameter11 = new Parameter ("eventChannel", "eventChannel", -1, 7, 0, 11);
+    parameters.add (parameter11);
+
+    // Parameter 12 code
+    auto parameter12 = new Parameter ("v_zero", -32700, 32700, 0, 12);
+    parameters.add (parameter12);
+
+
   //[OPENEPHYS_PARAMETERS_SECTION_END]
 
   //Without a custom editor, generic parameter controls can be added
@@ -69,7 +122,7 @@ AudioProcessorEditor* SalpaProcessor::createEditor() {
 
 void SalpaProcessor::setParameter(int idx, float val) {
   printf("salpa set param %i %g\n", idx, val);
-  //  GenericProcessor::setParameter(idx, val);
+  GenericProcessor::setParameter(idx, val);
   editor->updateParameterButtons(idx);
   switch (idx) {
   case PARAM_V_ZERO:
@@ -123,7 +176,7 @@ void SalpaProcessor::train(AudioSampleBuffer &buffer) {
     noise.makeready();
     for (int n=0; n<fitters.size(); n++)
       printf("noise[%i] = %g\n", n, noise.std(n));
-    if (!useabsthr) 
+    if (!useabsthr)
       for (int n=0; n<fitters.size(); n++)
         fitters[n]->setthreshold(relthr * noise.std(n));
   } else {
@@ -142,8 +195,8 @@ void SalpaProcessor::dropFitters() {
     delete b;
   for (auto b: outbufs)
     delete b;
-}   
- 
+}
+
 void SalpaProcessor::createFitters(int nChannels) {
   dropFitters();
   fitters.resize(nChannels);
@@ -176,7 +229,7 @@ void SalpaProcessor::process(AudioSampleBuffer &buffer) {
       outbufs[c]->fill(v_zero);
     fitters[0]->inirep();
   }
-  
+
   for (int c=0; c<nChannels; c++) {
     int nSamples = getNumSamples(c);
     float *samplePtr = buffer.getWritePointer(c, 0);
@@ -185,7 +238,7 @@ void SalpaProcessor::process(AudioSampleBuffer &buffer) {
     for (int n=0; n<nSamples; n++)
       inbuf[t0+n] = samplePtr[n];
     inbuf.donewriting(nSamples);
-    if (inbuf.latest() > delay) 
+    if (inbuf.latest() > delay)
       fitters[c]->process(inbuf.latest() - delay);
     CyclBuf<raw_t> &outbuf(*outbufs[c]);
     for (int n=0; n<nSamples; n++)
