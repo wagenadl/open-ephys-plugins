@@ -39,8 +39,7 @@ FutureThresholdProcessor::FutureThresholdProcessor():
   reset_threshold(5000),
   future_samps(0),
   triggered(false),
-  eventChannelPtr(nullptr)
-{
+  eventChannelPtr(nullptr) {
   setProcessorType (PROCESSOR_TYPE_FILTER);
 
   // Open Ephys Plugin Generator will insert generated code for parameters here. Don't edit this section.
@@ -222,6 +221,22 @@ void FutureThresholdProcessor::saveCustomParametersToXml (XmlElement* parentElem
   XmlElement* mainNode = parentElement->createNewChildElement ("FutureThresholdProcessor");
   mainNode->setAttribute ("numParameters", getNumParameters());
 
+  auto saveParameter = [this, mainNode](int idx,
+                                        float value) {
+    XmlElement* parameterNode = mainNode->createNewChildElement ("Parameter");
+    auto parameter = getParameterObject(idx);
+    parameterNode->setAttribute ("name", parameter->getName());
+    parameterNode->setAttribute ("type", parameter->getParameterTypeString());
+    parameterNode->setAttribute ("value", value);
+  };
+
+  saveParameter(PARAM_INPUT_CHANNEL, input_channel);
+  saveParameter(PARAM_OUTPUT_CHANNEL, output_channel);
+  saveParameter(PARAM_TRIGGER_THRESHOLD, trigger_threshold);
+  saveParameter(PARAM_RESET_THRESHOLD, reset_threshold);
+  saveParameter(PARAM_DELAY_SAMPS, future_samps);
+
+  if (false) {
   // Open Ephys Plugin Generator will insert generated code to save parameters here. Don't edit this section.
   //[OPENEPHYS_PARAMETERS_SAVE_SECTION_BEGIN]
   for (int i = 0; i < getNumParameters(); ++i)
@@ -240,6 +255,7 @@ void FutureThresholdProcessor::saveCustomParametersToXml (XmlElement* parentElem
         parameterNode->setAttribute ("value", (double)parameterValue);
     }
   //[OPENEPHYS_PARAMETERS_SAVE_SECTION_END]
+  }
 }
 
 
@@ -265,6 +281,7 @@ void FutureThresholdProcessor::loadCustomParametersFromXml()
                   ++parameterIdx;
 
                   String parameterType = parameterNode->getStringAttribute ("type");
+                  printf("parameter %i: %g\n", parameterIdx, parameterNode->getDoubleAttribute("value"));
                   if (parameterType == "Boolean")
                     setParameter (parameterIdx, parameterNode->getBoolAttribute ("value"));
                   else if (parameterType == "Continuous" || parameterType == "Numerical")
