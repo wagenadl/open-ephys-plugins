@@ -53,13 +53,81 @@ FutureThresholdProcessorEditor::FutureThresholdProcessorEditor(FutureThresholdPr
 }
 
 
-FutureThresholdProcessorEditor::~FutureThresholdProcessorEditor()
-{
+FutureThresholdProcessorEditor::~FutureThresholdProcessorEditor() {
+}
+
+void FutureThresholdProcessorEditor::saveCustomParameters(XmlElement *xml) {
+  GenericEditor::saveCustomParameters(xml);
+  FutureThresholdProcessor *processor
+    = dynamic_cast<FutureThresholdProcessor *>(getProcessor());
+  if (!processor) {
+    printf("FUTURETHRESHOLDPROCESSOREDITOR - No PROCESSOR\n");
+    return;
+  }
+  XmlElement *mainNode = xml->createNewChildElement("VALUES");
+
+  auto saveParameter = [this, processor, mainNode](int idx, float value) {
+    auto parameter = processor->getParameterObject(idx);
+    mainNode->setAttribute(parameter->getName(), value);
+  };
+
+  saveParameter(FutureThresholdProcessor::PARAM_INPUT_CHANNEL,
+                processor->input_channel);
+  saveParameter(FutureThresholdProcessor::PARAM_OUTPUT_CHANNEL,
+                processor->output_channel);
+  saveParameter(FutureThresholdProcessor::PARAM_TRIGGER_THRESHOLD,
+                processor->trigger_threshold);
+  saveParameter(FutureThresholdProcessor::PARAM_RESET_THRESHOLD,
+                processor->reset_threshold);
+  saveParameter(FutureThresholdProcessor::PARAM_DELAY_SAMPS,
+                processor->future_samps);
+}
+
+void FutureThresholdProcessorEditor::loadCustomParameters(XmlElement *xml) {
+  GenericEditor::loadCustomParameters(xml);
+  FutureThresholdProcessor *processor
+    = dynamic_cast<FutureThresholdProcessor *>(getProcessor());
+  if (!processor) {
+    printf("FUTURETHRESHOLDPROCESSOREDITOR - NO PROCESSOR\n");
+    return;
+  }
+  
+  bool ok = false;
+  forEachXmlChildElementWithTagName(*xml, mainNode, "VALUES") {
+    auto loadParameter = [this, processor, mainNode](int idx) {
+      auto parameter = processor->getParameterObject(idx);
+      return mainNode->getDoubleAttribute(parameter->getName());
+    };
+    ok = true;
+    
+    int inpch = loadParameter(FutureThresholdProcessor::PARAM_INPUT_CHANNEL);
+    if (inpch>=0)
+      content.adcChannel->setValue(inpch+1);
+    else
+      content.adcChannel->setValue(0);
+    int outpch = loadParameter(FutureThresholdProcessor::PARAM_OUTPUT_CHANNEL);
+    if (outpch>=0)
+      content.eventChannel->setText(String(outpch+1));
+    else
+      content.eventChannel->setText("-");
+
+    float tt = loadParameter(FutureThresholdProcessor::PARAM_TRIGGER_THRESHOLD);
+    content.triggerThreshold->setValue(tt);
+
+    float rt = loadParameter(FutureThresholdProcessor::PARAM_RESET_THRESHOLD);
+    content.resetThreshold->setValue(rt);
+    
+    float fut = loadParameter(FutureThresholdProcessor::PARAM_DELAY_SAMPS);
+    content.futureMS->setValue(fut);
+  }
+  if (!ok) {
+    printf("FUTURETHRESHOLDPROCESSOREDITOR - NO XML CONTENT\n");
+  }
 }
 
 
-void FutureThresholdProcessorEditor::resized()
-{
+
+void FutureThresholdProcessorEditor::resized() {
     // Don't edit this section.
     //[OPENEPHYS_EDITOR_PRE_RESIZE_SECTION_BEGIN]
 

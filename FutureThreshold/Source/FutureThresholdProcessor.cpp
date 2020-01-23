@@ -87,8 +87,8 @@ AudioProcessorEditor* FutureThresholdProcessor::createEditor() {
 }
 
 
-void FutureThresholdProcessor::setParameter(int parameterIndex, float newValue)
-{
+void FutureThresholdProcessor::setParameter(int parameterIndex,
+                                            float newValue) {
   GenericProcessor::setParameter (parameterIndex, newValue);
   editor->updateParameterButtons (parameterIndex);
 
@@ -127,9 +127,9 @@ void FutureThresholdProcessor::createEventChannels() {
     return;
   }
 
-  float sampleRate = in->getSampleRate();
+  //  float sampleRate = in->getSampleRate();
   EventChannel *chan = new EventChannel(EventChannel::TTL, 8, 1,
-                                        sampleRate, this);
+                                        in, this);
   chan->setName("Schmitt trigger output");
   chan->setDescription("Triggers whenever the input signal crosses"
                        " a voltage threshold.");
@@ -149,7 +149,8 @@ void FutureThresholdProcessor::process(AudioSampleBuffer &buffer) {
   }
 
   int nSamples = /*buffer.getNumSamples(); //*/ getNumSamples(input_channel);
-  printf("nsamples = %i [%i] x %i\n", nSamples, getNumSamples(input_channel), buffer.getNumChannels());
+  printf("nsamples = %i [%i] x %i\n", nSamples, getNumSamples(input_channel),
+         buffer.getNumChannels());
   //         addEvents(events, TTL, n);
   float const *rp = buffer.getReadPointer(input_channel);
   juce::int64 startTs = getTimestamp(input_channel);
@@ -218,16 +219,16 @@ void FutureThresholdProcessor::process(AudioSampleBuffer &buffer) {
 
 void FutureThresholdProcessor::saveCustomParametersToXml (XmlElement* parentElement)
 {
-  XmlElement* mainNode = parentElement->createNewChildElement ("FutureThresholdProcessor");
-  mainNode->setAttribute ("numParameters", getNumParameters());
+  XmlElement* mainNode = parentElement->createNewChildElement("FutureThresholdProcessor");
+  mainNode->setAttribute("numParameters", getNumParameters());
 
   auto saveParameter = [this, mainNode](int idx,
                                         float value) {
-    XmlElement* parameterNode = mainNode->createNewChildElement ("Parameter");
+    XmlElement* parameterNode = mainNode->createNewChildElement("Parameter");
     auto parameter = getParameterObject(idx);
-    parameterNode->setAttribute ("name", parameter->getName());
-    parameterNode->setAttribute ("type", parameter->getParameterTypeString());
-    parameterNode->setAttribute ("value", value);
+    parameterNode->setAttribute("name", parameter->getName());
+    parameterNode->setAttribute("type", parameter->getParameterTypeString());
+    parameterNode->setAttribute("value", value);
   };
 
   saveParameter(PARAM_INPUT_CHANNEL, input_channel);

@@ -65,6 +65,8 @@ public:
       */
     //void updateSettings();
 
+  void saveCustomParameters(XmlElement* xml) override;
+  void loadCustomParameters(XmlElement* xml) override;
 
 private:
     // This component contains all components and graphics that were added using Projucer.
