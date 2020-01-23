@@ -75,23 +75,14 @@ public:
       It's called after the processors' same named method.
       */
     //void updateSettings();
-  void updateGuiForParameter(int idx);
-
+  void saveCustomParameters(XmlElement* xml) override;
+  void loadCustomParameters(XmlElement* xml) override;
 private:
     // This component contains all components and graphics that were added using Projucer.
     // It's bounds initially the same bounds as the gray workspace (but only till the drawerButton for X)
     SalpaProcessorContentComponent content;
-
-    //ScopedPointer<LookAndFeel> m_contentLookAndFeel;
-
-    /**
-        Here would be all the required internal variables.
-        In this case, we have a single button.
-    */
-    //Always use JUCE RAII classes instead of pure pointers.
-    //ScopedPointer<Button> exampleButton;
-
-
+private:
+  class SalpaProcessorVisualizerContentComponent *visualizerContent(); // may be null
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SalpaProcessorEditor);
 };
 

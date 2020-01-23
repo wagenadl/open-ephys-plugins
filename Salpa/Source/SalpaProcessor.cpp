@@ -116,7 +116,7 @@ SalpaProcessor::~SalpaProcessor() {
    If the processor uses a custom editor, this method must be present.
 */
 AudioProcessorEditor* SalpaProcessor::createEditor() {
-  editor = myeditor = new SalpaProcessorEditor(this, false);
+  editor = new SalpaProcessorEditor(this, false);
   return editor;
 }
 
@@ -124,7 +124,6 @@ void SalpaProcessor::setParameter(int idx, float val) {
   printf("salpa set param %i %g\n", idx, val);
   GenericProcessor::setParameter(idx, val);
   editor->updateParameterButtons(idx); // ?
-  //  myeditor->updateGuiForParameter(idx);
   switch (idx) {
   case PARAM_V_ZERO:
     v_zero = val;
@@ -256,91 +255,6 @@ void SalpaProcessor::process(AudioSampleBuffer &buffer) {
       samplePtr[n] = outbuf[t0 - delay + n];
   }
   fitters[0]->report();
-}
-
-void SalpaProcessor::saveCustomParametersToXml (XmlElement* parentElement) {
-  XmlElement *mainNode = parentElement->createNewChildElement("SalpaProcessor");
-  mainNode->setAttribute("numParameters", getNumParameters());
-
-
-  auto saveParameter = [this, mainNode](int idx,
-                                        float value) {
-    XmlElement* parameterNode = mainNode->createNewChildElement("Parameter");
-    auto parameter = getParameterObject(idx);
-    parameterNode->setAttribute("name", parameter->getName());
-    parameterNode->setAttribute("type", parameter->getParameterTypeString());
-    parameterNode->setAttribute("value", value);
-  };
-
-  saveParameter(PARAM_V_NEG_RAIL, v_neg_rail);
-  saveParameter(PARAM_V_POS_RAIL, v_pos_rail);
-  saveParameter(PARAM_T_POTBLANK, t_potblank);
-  saveParameter(PARAM_T_BLANKDUR, t_blankdur);
-  saveParameter(PARAM_N_TOOPOOR, n_toopoor);
-  saveParameter(PARAM_T_AHEAD, t_ahead);
-  saveParameter(PARAM_TAU, tau);
-  saveParameter(PARAM_RELTHR, relthr);
-  saveParameter(PARAM_ABSTHR, absthr);
-  saveParameter(PARAM_USEABSTHR, useabsthr);
-  saveParameter(PARAM_T_ASYM, t_asym);
-  saveParameter(PARAM_EVENTCHANNEL, eventchannel);
-  saveParameter(PARAM_V_ZERO, v_zero);
-  
-  if (false) {
-  // Open Ephys Plugin Generator will insert generated code to save parameters here. Don't edit this section.
-  //[OPENEPHYS_PARAMETERS_SAVE_SECTION_BEGIN]
-  for (int i = 0; i < getNumParameters(); ++i)
-    {
-      XmlElement* parameterNode = mainNode->createNewChildElement ("Parameter");
-
-      auto parameter = getParameterObject(i);
-      parameterNode->setAttribute ("name", parameter->getName());
-      parameterNode->setAttribute ("type", parameter->getParameterTypeString());
-
-      auto parameterValue = getParameterVar (i, currentChannel);
-
-      if (parameter->isBoolean())
-        parameterNode->setAttribute ("value", (int)parameterValue);
-      else if (parameter->isContinuous() || parameter->isDiscrete() || parameter->isNumerical())
-        parameterNode->setAttribute ("value", (double)parameterValue);
-    }
-  //[OPENEPHYS_PARAMETERS_SAVE_SECTION_END]
-  }
-}
-
-
-void SalpaProcessor::loadCustomParametersFromXml() {
-  if (parametersAsXml == nullptr) // prevent double-loading
-    return;
-
-  // use parametersAsXml to restore state
-
-  // Open Ephys Plugin Generator will insert generated code to load parameters here. Don't edit this section.
-  //[OPENEPHYS_PARAMETERS_LOAD_SECTION_BEGIN]
-  forEachXmlChildElement (*parametersAsXml, mainNode)
-    {
-      if (mainNode->hasTagName ("SalpaProcessor"))
-        {
-          int parameterIdx = -1;
-
-          forEachXmlChildElement (*mainNode, parameterNode)
-            {
-              if (parameterNode->hasTagName ("Parameter"))
-                {
-                  ++parameterIdx;
-
-                  String parameterType = parameterNode->getStringAttribute ("type");
-                  if (parameterType == "Boolean")
-                    setParameter (parameterIdx, parameterNode->getBoolAttribute ("value"));
-                  else if (parameterType == "Continuous" || parameterType == "Numerical")
-                    setParameter (parameterIdx, parameterNode->getDoubleAttribute ("value"));
-                  else if (parameterType == "Discrete")
-                    setParameter (parameterIdx, parameterNode->getIntAttribute ("value"));
-                }
-            }
-        }
-    }
-  //[OPENEPHYS_PARAMETERS_LOAD_SECTION_END]
 }
 
 void SalpaProcessor::handleEvent(EventChannel const *eventInfo, MidiMessage const &event,

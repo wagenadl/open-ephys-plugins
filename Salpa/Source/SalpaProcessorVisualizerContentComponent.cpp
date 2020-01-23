@@ -18,10 +18,10 @@
 */
 
 //[Headers] You can add your own extra header files here...
+#include "SalpaProcessor.h"
 //[/Headers]
 
 #include "SalpaProcessorVisualizerContentComponent.h"
-
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
 //[/MiscUserDefs]
@@ -170,7 +170,11 @@ SalpaProcessorVisualizerContentComponent::~SalpaProcessorVisualizerContentCompon
 void SalpaProcessorVisualizerContentComponent::paint (Graphics& g)
 {
     //[UserPrePaint] Add your own custom painting code here..
-    //[/UserPrePaint]
+  printf("paint - %p\n", processor);
+  GenericEditor *ed = processor->editor;
+  printf("paint --- %p\n", ed);
+    ColourGradient editorBg = ed->getBackgroundGradient();
+    g.fillAll(editorBg.getColourAtPosition(0.5)); // roughly matches editor back    //[/UserPrePaint]
 
     //[UserPaint] Add your own custom painting code here..
     //[/UserPaint]
@@ -207,11 +211,14 @@ void SalpaProcessorVisualizerContentComponent::buttonClicked (Button* buttonThat
     if (buttonThatWasClicked == absenable)
     {
         //[UserButtonCode_absenable] -- add your button handler code here..
+      processor->setParameter(SalpaProcessor::PARAM_USEABSTHR,
+                              buttonThatWasClicked->getToggleState());
         //[/UserButtonCode_absenable]
     }
     else if (buttonThatWasClicked == resetTraining)
     {
         //[UserButtonCode_resetTraining] -- add your button handler code here..
+      processor->forgetTraining();
         //[/UserButtonCode_resetTraining]
     }
 
@@ -227,31 +234,43 @@ void SalpaProcessorVisualizerContentComponent::sliderValueChanged (Slider* slide
     if (sliderThatWasMoved == asymdur)
     {
         //[UserSliderCode_asymdur] -- add your slider handling code here..
+      processor->setParameter(SalpaProcessor::PARAM_T_ASYM,
+                              sliderThatWasMoved->getValue());
         //[/UserSliderCode_asymdur]
     }
     else if (sliderThatWasMoved == blankdur)
     {
         //[UserSliderCode_blankdur] -- add your slider handling code here..
+      processor->setParameter(SalpaProcessor::PARAM_T_BLANKDUR,
+                              sliderThatWasMoved->getValue());
         //[/UserSliderCode_blankdur]
     }
     else if (sliderThatWasMoved == potdur)
     {
         //[UserSliderCode_potdur] -- add your slider handling code here..
+      processor->setParameter(SalpaProcessor::PARAM_T_POTBLANK,
+                              sliderThatWasMoved->getValue());
         //[/UserSliderCode_potdur]
     }
     else if (sliderThatWasMoved == negrail)
     {
         //[UserSliderCode_negrail] -- add your slider handling code here..
+      processor->setParameter(SalpaProcessor::PARAM_V_NEG_RAIL,
+                              sliderThatWasMoved->getValue());
         //[/UserSliderCode_negrail]
     }
     else if (sliderThatWasMoved == posrail)
     {
         //[UserSliderCode_posrail] -- add your slider handling code here..
+      processor->setParameter(SalpaProcessor::PARAM_V_POS_RAIL,
+                              sliderThatWasMoved->getValue());
         //[/UserSliderCode_posrail]
     }
     else if (sliderThatWasMoved == digithr)
     {
         //[UserSliderCode_digithr] -- add your slider handling code here..
+      processor->setParameter(SalpaProcessor::PARAM_ABSTHR,
+                              sliderThatWasMoved->getValue());
         //[/UserSliderCode_digithr]
     }
 

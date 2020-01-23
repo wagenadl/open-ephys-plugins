@@ -68,13 +68,14 @@ public:
     void setParameter (int, int, int, float) override;
 
 private:
-    SalpaProcessor* processor;
-
     // This component contains all components and graphics that were added using Projucer.
     // It's bounds initially have same bounds as the canvas itself.
     SalpaProcessorVisualizerContentComponent content;
+  friend class SalpaProcessorEditor;
     //
     //ScopedPointer<LookAndFeel> m_contentLookAndFeel;
+
+  
 
     // ========================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SalpaProcessorVisualizer);

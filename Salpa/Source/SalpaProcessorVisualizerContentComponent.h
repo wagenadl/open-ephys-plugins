@@ -60,7 +60,8 @@ private:
     // Make an editor to be friendly class of this content component,
     // so the editor will have access to all methods and variables of this component.
     friend class SalpaProcessorVisualizer;
-
+    friend class SalpaProcessorEditor;
+  class SalpaProcessor *processor;
     //[/UserVariables]
 
     //==============================================================================

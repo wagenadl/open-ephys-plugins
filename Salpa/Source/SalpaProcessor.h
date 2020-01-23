@@ -67,13 +67,12 @@ public:
   void process(AudioSampleBuffer &buffer) override;
   void setParameter(int parameterIndex, float newValue) override;
   void forgetTraining();
-  void saveCustomParametersToXml(XmlElement *parentElement) override;
-  void loadCustomParametersFromXml() override;
   void handleEvent(EventChannel const *eventInfo, MidiMessage const &event,
                    int samplePosition) override;
   void prepareToPlay(double sampleRate, int estimatedSamplesPerBlock) override;
 private:
   friend class SalpaProcessorEditor;
+  friend class SalpaProcessorVisualizer;
   // parameters
   raw_t v_zero;
   raw_t v_neg_rail, v_pos_rail;
@@ -90,7 +89,6 @@ private:
   std::vector<CyclBuf<raw_t> *> outbufs;
   NoiseLevels noise;
   int delay;
-  class SalpaProcessorEditor *myeditor;
 private:
   void createFitters(int nChannels);
   void dropFitters();
