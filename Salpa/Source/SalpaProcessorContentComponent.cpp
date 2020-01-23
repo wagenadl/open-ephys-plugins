@@ -203,11 +203,16 @@ void SalpaProcessorContentComponent::sliderValueChanged (Slider* sliderThatWasMo
 void SalpaProcessorContentComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
 {
     //[UsercomboBoxChanged_Pre]
+  String s = comboBoxThatHasChanged->getText();
+  int ch = s.getIntValue() - 1;
     //[/UsercomboBoxChanged_Pre]
 
     if (comboBoxThatHasChanged == eventChannel)
     {
         //[UserComboBoxCode_eventChannel] -- add your combo box handling code here..
+      if (processor)
+        processor->setParameter(SalpaProcessor::PARAM_EVENTCHANNEL, ch);
+      
         //[/UserComboBoxCode_eventChannel]
     }
 

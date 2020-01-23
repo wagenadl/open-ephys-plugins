@@ -33,6 +33,7 @@
 #include "NoiseLevels.h"
 #include "LocalFit.h"
 #include "CyclBuf.h"
+#include <queue>
 
 /**
     This class serves as a template for creating new processors.
@@ -89,6 +90,10 @@ private:
   std::vector<CyclBuf<raw_t> *> outbufs;
   NoiseLevels noise;
   int delay;
+  std::queue<timeref_t> forcestarts;
+  std::queue<timeref_t> forceends;
+  timeref_t t0;
+  bool mustrebuild;
 private:
   void createFitters(int nChannels);
   void dropFitters();

@@ -165,7 +165,7 @@ void SalpaProcessor::setParameter(int idx, float val) {
     eventchannel = val;
     break;
   }
-  dropFitters();
+  mustrebuild = true;
 }
 
 void SalpaProcessor::train(AudioSampleBuffer &buffer) {
@@ -201,6 +201,7 @@ void SalpaProcessor::dropFitters() {
 }
 
 void SalpaProcessor::createFitters(int nChannels) {
+  mustrebuild = false;
   dropFitters();
   fitters.resize(nChannels);
   inbufs.resize(nChannels);
@@ -216,6 +217,8 @@ void SalpaProcessor::createFitters(int nChannels) {
     fitters[c]->setrail(v_neg_rail, v_pos_rail);
     fitters[c]->setthreshold(useabsthr ? absthr : relthr * noise.std(c));
     delay = fitters[c]->requireddelay(); // will be all the same
+    if (tau + t_potblank > delay)
+      delay = tau + t_potblank;
   }
 }
 
@@ -226,45 +229,92 @@ void SalpaProcessor::prepareToPlay(double sampleRate, int estimatedSamplesPerBlo
 void SalpaProcessor::process(AudioSampleBuffer &buffer) {
   juce::int64 startTs = getTimestamp(0);
   printf("SALPA: process: %Li\n", startTs);
-  int res = checkForEvents();
-  printf("Done checking for events: %i\n", res);
+  if (eventchannel>=0) {
+    t0 = startTs;
+    checkForEvents();
+  }
   if (!noise.isready())
     train(buffer);
 
   int nChannels = buffer.getNumChannels();
-  if (nChannels != fitters.size()) {
+  if (nChannels<=0) {
+    printf("SALPA: no channels\n");
+    return;
+  }
+  int nSamples = getNumSamples(0);
+  
+  if (mustrebuild || nChannels != fitters.size()) {
     createFitters(nChannels);
-    // this must be the first part of the run
+    // this must be the first part of the run or parameters have changed
     for (int c=0; c<nChannels; c++)
       outbufs[c]->fill(v_zero);
     fitters[0]->inirep();
   }
 
   for (int c=0; c<nChannels; c++) {
-    int nSamples = getNumSamples(c);
-    float *samplePtr = buffer.getWritePointer(c, 0);
+    float const *samplePtr = buffer.getReadPointer(c, 0);
     CyclBuf<raw_t> &inbuf(*inbufs[c]);
     timeref_t t0 = inbuf.latest();
     for (int n=0; n<nSamples; n++)
       inbuf[t0+n] = samplePtr[n];
     inbuf.donewriting(nSamples);
-    if (inbuf.latest() > delay)
-      fitters[c]->process(inbuf.latest() - delay);
+  }
+
+  timeref_t tlim = inbufs[0]->latest();
+  if (tlim < delay)
+    tlim = 0;
+  else
+    tlim -= delay;
+
+  if (eventchannel >= 0) {
+    while (!forcestarts.empty()) {
+      timeref_t tfrom = forcestarts.front();
+      timeref_t tto = forceends.front();
+      printf("forcepeg %li - %li [%li - %li]\n",
+             tfrom, tto, t0, tlim);
+      if (tto <= tlim) {
+        for (int c=0; c<nChannels; c++)
+          fitters[c]->forcepeg(tfrom, tto);
+        forcestarts.pop();
+        forceends.pop();
+      } else if (tfrom < tlim) {
+        for (int c=0; c<nChannels; c++)
+          fitters[c]->forcepeg(tfrom, tlim);
+        forcestarts.front() = tlim;
+        // leave some of the forced peg to next cycle
+        break;
+      } else {
+        // leave all ofr the forced peg to the next cycle
+        break;
+      }
+    }
+  }
+
+  for (int c=0; c<nChannels; c++)
+    fitters[c]->process(tlim);
+
+  for (int c=0; c<nChannels; c++) {
+    float *samplePtr = buffer.getWritePointer(c, 0);
     CyclBuf<raw_t> &outbuf(*outbufs[c]);
     for (int n=0; n<nSamples; n++)
       samplePtr[n] = outbuf[t0 - delay + n];
   }
+  
   fitters[0]->report();
 }
 
-void SalpaProcessor::handleEvent(EventChannel const *eventInfo, MidiMessage const &event,
+void SalpaProcessor::handleEvent(EventChannel const *eventInfo,
+                                 MidiMessage const &event,
                                  int samplePosition) {
-  printf("Salpa: event\n");
   if (Event::getEventType(event) == EventChannel::TTL) {
     TTLEventPtr ttl = TTLEvent::deserializeFromMessage(event, eventInfo);
     int id = ttl->getState() ? 1 : 0;
     int ch = ttl->getChannel();
     int t = samplePosition;
-    printf("Salpa: event id %i channel %i time %i\n", id, ch, t);
+    printf("Salpa: event id %i channel %i time %i / %i\n", id, ch, t, eventchannel);
+    if (id and ch==eventchannel) {
+      forcestarts.push(t + t0);
+      forceends.push(t + t0 + t_potblank);
+    }
   }
 }
