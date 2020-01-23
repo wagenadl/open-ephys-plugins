@@ -45,6 +45,7 @@ SalpaProcessor::SalpaProcessor(): GenericProcessor("SALPA"),
                                   relthr(3.5),
                                   eventchannel(-1),
                                   delay(0) {
+  eventChannelPtr = 0;
   setProcessorType (PROCESSOR_TYPE_FILTER);
 
   // Open Ephys Plugin Generator will insert generated code for parameters here. Don't edit this section.
@@ -242,7 +243,7 @@ void SalpaProcessor::process(AudioSampleBuffer &buffer) {
     return;
   }
   int nSamples = getNumSamples(0);
-  
+
   if (mustrebuild || nChannels != fitters.size()) {
     createFitters(nChannels);
     // this must be the first part of the run or parameters have changed
@@ -299,7 +300,7 @@ void SalpaProcessor::process(AudioSampleBuffer &buffer) {
     for (int n=0; n<nSamples; n++)
       samplePtr[n] = outbuf[t0 - delay + n];
   }
-  
+
   fitters[0]->report();
 }
 
@@ -315,6 +316,53 @@ void SalpaProcessor::handleEvent(EventChannel const *eventInfo,
     if (id and ch==eventchannel) {
       forcestarts.push(t + t0);
       forceends.push(t + t0 + t_potblank);
+
+      if (eventChannelPtr) {
+        ch += 1;
+        // following may not be correct. tricky with delay.
+        MetaDataValueArray mdArray;
+        // MetaDataValue *mdv_time
+        //   = new MetaDataValue(*eventMetaDataDescriptors[0]);
+        // mdv_time->setValue(startTs + i);
+        // mdArray.add(mdv_time);
+        juce::uint8 ttlDataOn = 1<<ch;
+        juce::int64 eventTsOn = t + t0 + delay;
+        TTLEventPtr eventOn = TTLEvent::createTTLEvent(eventChannelPtr,
+                                                        eventTsOn,
+                                                        &ttlDataOn,
+                                                        sizeof(juce::uint8),
+                                                        mdArray,
+                                                        ch);
+        addEvent(eventChannelPtr, eventOn, t + delay);
+        juce::uint8 ttlDataOff = 0;
+        juce::int64 eventTsOff = t + t0 + t_potblank + delay;
+        TTLEventPtr eventOff = TTLEvent::createTTLEvent(eventChannelPtr,
+                                                        eventTsOff,
+                                                        &ttlDataOff,
+                                                        sizeof(juce::uint8),
+                                                        mdArray,
+                                                        ch);
+        addEvent(eventChannelPtr, eventOff, t + t_potblank + delay);
+      }
     }
   }
+}
+
+
+void SalpaProcessor::createEventChannels() {
+  DataChannel const *in = getDataChannel(0);
+  if (!in) {
+    eventChannelPtr = nullptr;
+    printf("No input - no event channel created\n");
+    return;
+  }
+
+  //  float sampleRate = in->getSampleRate();
+  EventChannel *chan = new EventChannel(EventChannel::TTL, 8, 1,
+                                        in, this);
+  chan->setName("SALPA events");
+  chan->setDescription("Delayed event");
+  chan->setIdentifier("salpa.event");
+
+  eventChannelPtr = eventChannelArray.add(chan);
 }

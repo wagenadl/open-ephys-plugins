@@ -70,6 +70,7 @@ public:
   void forgetTraining();
   void handleEvent(EventChannel const *eventInfo, MidiMessage const &event,
                    int samplePosition) override;
+  void createEventChannels() override;
   void prepareToPlay(double sampleRate, int estimatedSamplesPerBlock) override;
 private:
   friend class SalpaProcessorEditor;
@@ -94,6 +95,7 @@ private:
   std::queue<timeref_t> forceends;
   timeref_t t0;
   bool mustrebuild;
+  EventChannel *eventChannelPtr;
 private:
   void createFitters(int nChannels);
   void dropFitters();

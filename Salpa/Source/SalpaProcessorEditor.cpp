@@ -176,7 +176,7 @@ void SalpaProcessorEditor::loadCustomParameters(XmlElement *xml) {
   }
 
   SalpaProcessorVisualizerContentComponent *viscont = visualizerContent();
-  
+
   bool ok = false;
   forEachXmlChildElementWithTagName(*xml, mainNode, "VALUES") {
     auto loadParameter = [this, processor, mainNode](int idx) {
@@ -202,7 +202,7 @@ void SalpaProcessorEditor::loadCustomParameters(XmlElement *xml) {
       viscont->potdur->setValue(t_potblank);
     else
       processor->setParameter(SalpaProcessor::PARAM_T_POTBLANK, t_potblank);
-    
+
     float t_blankdur = loadParameter(SalpaProcessor::PARAM_T_BLANKDUR);
     if (viscont)
       viscont->blankdur->setValue(t_blankdur);
@@ -210,7 +210,7 @@ void SalpaProcessorEditor::loadCustomParameters(XmlElement *xml) {
       processor->setParameter(SalpaProcessor::PARAM_T_BLANKDUR, t_blankdur);
 
     // n_toopoor is not exposed to the gui
-    
+
     float t_ahead = loadParameter(SalpaProcessor::PARAM_T_AHEAD);
     content.lookahead->setValue(t_ahead);
 
@@ -237,7 +237,7 @@ void SalpaProcessorEditor::loadCustomParameters(XmlElement *xml) {
       viscont->asymdur->setValue(t_asym);
     else
       processor->setParameter(SalpaProcessor::PARAM_T_ASYM, t_asym);
-    
+
     int evtch = loadParameter(SalpaProcessor::PARAM_EVENTCHANNEL);
     if (evtch>=0)
       content.eventChannel->setText(String(evtch + 1));
@@ -245,7 +245,7 @@ void SalpaProcessorEditor::loadCustomParameters(XmlElement *xml) {
       content.eventChannel->setText(String("-"));
 
     // v_zero is not exposed to the gui
-    
+
   }
   if (!ok) {
     printf("SALPAPROCESSOREDITOR - NO XML CONTENT\n");

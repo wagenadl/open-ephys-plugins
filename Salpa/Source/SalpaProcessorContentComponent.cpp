@@ -62,7 +62,7 @@ SalpaProcessorContentComponent::SalpaProcessorContentComponent ()
     label3->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
     addAndMakeVisible (labl2 = new Label ("new label",
-                                          TRANS("Event ch.")));
+                                          TRANS("Peg on event")));
     labl2->setTooltip (TRANS("Event channel for forced peg\n"));
     labl2->setFont (Font (15.00f, Font::plain));
     labl2->setJustificationType (Justification::centredLeft);
@@ -212,7 +212,7 @@ void SalpaProcessorContentComponent::comboBoxChanged (ComboBox* comboBoxThatHasC
         //[UserComboBoxCode_eventChannel] -- add your combo box handling code here..
       if (processor)
         processor->setParameter(SalpaProcessor::PARAM_EVENTCHANNEL, ch);
-      
+
         //[/UserComboBoxCode_eventChannel]
     }
 
@@ -257,7 +257,7 @@ BEGIN_JUCER_METADATA
          fontsize="15" bold="0" italic="0" justification="33"/>
   <LABEL name="new label" id="488849cd5032876a" memberName="labl2" virtualName=""
          explicitFocusOrder="0" pos="0 75% 50% 24" tooltip="Event channel for forced peg&#10;"
-         edTextCol="ff000000" edBkgCol="0" labelText="Event ch." editableSingleClick="0"
+         edTextCol="ff000000" edBkgCol="0" labelText="Peg on event" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
          fontsize="15" bold="0" italic="0" justification="33"/>
   <SLIDER name="tau" id="f85c73add7da17e4" memberName="tau" virtualName=""
