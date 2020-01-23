@@ -75,7 +75,7 @@ public:
       It's called after the processors' same named method.
       */
     //void updateSettings();
-
+  void updateGuiForParameter(int idx);
 
 private:
     // This component contains all components and graphics that were added using Projucer.

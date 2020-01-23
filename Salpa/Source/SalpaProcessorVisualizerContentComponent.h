@@ -35,8 +35,8 @@
                                                                     //[/Comments]
 */
 class SalpaProcessorVisualizerContentComponent  : public Component,
-                                                  public SliderListener,
-                                                  public ButtonListener
+                                                  public ButtonListener,
+                                                  public SliderListener
 {
 public:
     //==============================================================================
@@ -49,8 +49,8 @@ public:
 
     void paint (Graphics& g) override;
     void resized() override;
-    void sliderValueChanged (Slider* sliderThatWasMoved) override;
     void buttonClicked (Button* buttonThatWasClicked) override;
+    void sliderValueChanged (Slider* sliderThatWasMoved) override;
 
 
 
@@ -64,19 +64,19 @@ private:
     //[/UserVariables]
 
     //==============================================================================
+    ScopedPointer<Label> label6;
+    ScopedPointer<ToggleButton> absenable;
     ScopedPointer<Label> label;
     ScopedPointer<Label> label2;
     ScopedPointer<Label> label3;
     ScopedPointer<Label> label4;
     ScopedPointer<Label> label5;
-    ScopedPointer<Label> label6;
     ScopedPointer<Slider> asymdur;
     ScopedPointer<Slider> blankdur;
     ScopedPointer<Slider> potdur;
     ScopedPointer<Slider> negrail;
     ScopedPointer<Slider> posrail;
     ScopedPointer<Slider> digithr;
-    ScopedPointer<ToggleButton> absenable;
     ScopedPointer<TextButton> resetTraining;
 
 

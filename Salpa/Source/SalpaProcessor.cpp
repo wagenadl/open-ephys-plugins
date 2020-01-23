@@ -42,7 +42,7 @@ SalpaProcessor::SalpaProcessor(): GenericProcessor("SALPA"),
                                   t_potblank(5),
                                   t_asym(15),
                                   absthr(0),
-                                  relthr(3),
+                                  relthr(3.5),
                                   eventchannel(-1),
                                   delay(0) {
   setProcessorType (PROCESSOR_TYPE_FILTER);
@@ -116,14 +116,15 @@ SalpaProcessor::~SalpaProcessor() {
    If the processor uses a custom editor, this method must be present.
 */
 AudioProcessorEditor* SalpaProcessor::createEditor() {
-  editor = new SalpaProcessorEditor(this, false);
+  editor = myeditor = new SalpaProcessorEditor(this, false);
   return editor;
 }
 
 void SalpaProcessor::setParameter(int idx, float val) {
   printf("salpa set param %i %g\n", idx, val);
   GenericProcessor::setParameter(idx, val);
-  editor->updateParameterButtons(idx);
+  editor->updateParameterButtons(idx); // ?
+  //  myeditor->updateGuiForParameter(idx);
   switch (idx) {
   case PARAM_V_ZERO:
     v_zero = val;
@@ -195,6 +196,9 @@ void SalpaProcessor::dropFitters() {
     delete b;
   for (auto b: outbufs)
     delete b;
+  fitters.clear();
+  inbufs.clear();
+  outbufs.clear();
 }
 
 void SalpaProcessor::createFitters(int nChannels) {
@@ -216,8 +220,15 @@ void SalpaProcessor::createFitters(int nChannels) {
   }
 }
 
+void SalpaProcessor::prepareToPlay(double sampleRate, int estimatedSamplesPerBlock) {
+  dropFitters();
+}
+
 void SalpaProcessor::process(AudioSampleBuffer &buffer) {
-  printf("SALPA: process\n");
+  juce::int64 startTs = getTimestamp(0);
+  printf("SALPA: process: %Li\n", startTs);
+  int res = checkForEvents();
+  printf("Done checking for events: %i\n", res);
   if (!noise.isready())
     train(buffer);
 
@@ -251,6 +262,31 @@ void SalpaProcessor::saveCustomParametersToXml (XmlElement* parentElement) {
   XmlElement *mainNode = parentElement->createNewChildElement("SalpaProcessor");
   mainNode->setAttribute("numParameters", getNumParameters());
 
+
+  auto saveParameter = [this, mainNode](int idx,
+                                        float value) {
+    XmlElement* parameterNode = mainNode->createNewChildElement("Parameter");
+    auto parameter = getParameterObject(idx);
+    parameterNode->setAttribute("name", parameter->getName());
+    parameterNode->setAttribute("type", parameter->getParameterTypeString());
+    parameterNode->setAttribute("value", value);
+  };
+
+  saveParameter(PARAM_V_NEG_RAIL, v_neg_rail);
+  saveParameter(PARAM_V_POS_RAIL, v_pos_rail);
+  saveParameter(PARAM_T_POTBLANK, t_potblank);
+  saveParameter(PARAM_T_BLANKDUR, t_blankdur);
+  saveParameter(PARAM_N_TOOPOOR, n_toopoor);
+  saveParameter(PARAM_T_AHEAD, t_ahead);
+  saveParameter(PARAM_TAU, tau);
+  saveParameter(PARAM_RELTHR, relthr);
+  saveParameter(PARAM_ABSTHR, absthr);
+  saveParameter(PARAM_USEABSTHR, useabsthr);
+  saveParameter(PARAM_T_ASYM, t_asym);
+  saveParameter(PARAM_EVENTCHANNEL, eventchannel);
+  saveParameter(PARAM_V_ZERO, v_zero);
+  
+  if (false) {
   // Open Ephys Plugin Generator will insert generated code to save parameters here. Don't edit this section.
   //[OPENEPHYS_PARAMETERS_SAVE_SECTION_BEGIN]
   for (int i = 0; i < getNumParameters(); ++i)
@@ -269,6 +305,7 @@ void SalpaProcessor::saveCustomParametersToXml (XmlElement* parentElement) {
         parameterNode->setAttribute ("value", (double)parameterValue);
     }
   //[OPENEPHYS_PARAMETERS_SAVE_SECTION_END]
+  }
 }
 
 
@@ -304,4 +341,16 @@ void SalpaProcessor::loadCustomParametersFromXml() {
         }
     }
   //[OPENEPHYS_PARAMETERS_LOAD_SECTION_END]
+}
+
+void SalpaProcessor::handleEvent(EventChannel const *eventInfo, MidiMessage const &event,
+                                 int samplePosition) {
+  printf("Salpa: event\n");
+  if (Event::getEventType(event) == EventChannel::TTL) {
+    TTLEventPtr ttl = TTLEvent::deserializeFromMessage(event, eventInfo);
+    int id = ttl->getState() ? 1 : 0;
+    int ch = ttl->getChannel();
+    int t = samplePosition;
+    printf("Salpa: event id %i channel %i time %i\n", id, ch, t);
+  }
 }

@@ -32,6 +32,18 @@ SalpaProcessorVisualizerContentComponent::SalpaProcessorVisualizerContentCompone
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
 
+    addAndMakeVisible (label6 = new Label ("new label",
+                                           TRANS("Absolute max. deviation")));
+    label6->setFont (Font (15.00f, Font::plain));
+    label6->setJustificationType (Justification::centredLeft);
+    label6->setEditable (false, false, false);
+    label6->setColour (TextEditor::textColourId, Colours::black);
+    label6->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+
+    addAndMakeVisible (absenable = new ToggleButton ("new toggle button"));
+    absenable->setButtonText (String());
+    absenable->addListener (this);
+
     addAndMakeVisible (label = new Label ("new label",
                                           TRANS("Asymmetry window width")));
     label->setFont (Font (15.00f, Font::plain));
@@ -71,14 +83,6 @@ SalpaProcessorVisualizerContentComponent::SalpaProcessorVisualizerContentCompone
     label5->setEditable (false, false, false);
     label5->setColour (TextEditor::textColourId, Colours::black);
     label5->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
-
-    addAndMakeVisible (label6 = new Label ("new label",
-                                           TRANS("Absolute max. deviation")));
-    label6->setFont (Font (15.00f, Font::plain));
-    label6->setJustificationType (Justification::centredLeft);
-    label6->setEditable (false, false, false);
-    label6->setColour (TextEditor::textColourId, Colours::black);
-    label6->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
     addAndMakeVisible (asymdur = new Slider ("asymdur"));
     asymdur->setTooltip (TRANS("\n"));
@@ -122,10 +126,6 @@ SalpaProcessorVisualizerContentComponent::SalpaProcessorVisualizerContentCompone
     digithr->setTextBoxStyle (Slider::TextBoxLeft, false, 70, 20);
     digithr->addListener (this);
 
-    addAndMakeVisible (absenable = new ToggleButton ("new toggle button"));
-    absenable->setButtonText (String());
-    absenable->addListener (this);
-
     addAndMakeVisible (resetTraining = new TextButton ("resetTraining"));
     resetTraining->setButtonText (TRANS("Reset noise data"));
     resetTraining->addListener (this);
@@ -146,19 +146,19 @@ SalpaProcessorVisualizerContentComponent::~SalpaProcessorVisualizerContentCompon
     //[Destructor_pre]. You can add your own custom destruction code here..
     //[/Destructor_pre]
 
+    label6 = nullptr;
+    absenable = nullptr;
     label = nullptr;
     label2 = nullptr;
     label3 = nullptr;
     label4 = nullptr;
     label5 = nullptr;
-    label6 = nullptr;
     asymdur = nullptr;
     blankdur = nullptr;
     potdur = nullptr;
     negrail = nullptr;
     posrail = nullptr;
     digithr = nullptr;
-    absenable = nullptr;
     resetTraining = nullptr;
 
 
@@ -181,22 +181,42 @@ void SalpaProcessorVisualizerContentComponent::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
+    label6->setBounds (0, 125, 200, 22);
+    absenable->setBounds (158, 127, 25, 20);
     label->setBounds (0, 0, 200, 20);
     label2->setBounds (0, 25, 200, 20);
     label3->setBounds (0, 50, 200, 20);
     label4->setBounds (0, 75, 200, 21);
     label5->setBounds (0, 100, 200, 21);
-    label6->setBounds (0, 125, 200, 22);
     asymdur->setBounds (180, 2, 120, 20);
     blankdur->setBounds (180, 27, 120, 20);
     potdur->setBounds (180, 52, 120, 20);
     negrail->setBounds (180, 77, 120, 20);
     posrail->setBounds (180, 102, 120, 20);
     digithr->setBounds (180, 127, 120, 20);
-    absenable->setBounds (158, 127, 20, 20);
     resetTraining->setBounds (144, 272, 150, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
+}
+
+void SalpaProcessorVisualizerContentComponent::buttonClicked (Button* buttonThatWasClicked)
+{
+    //[UserbuttonClicked_Pre]
+    //[/UserbuttonClicked_Pre]
+
+    if (buttonThatWasClicked == absenable)
+    {
+        //[UserButtonCode_absenable] -- add your button handler code here..
+        //[/UserButtonCode_absenable]
+    }
+    else if (buttonThatWasClicked == resetTraining)
+    {
+        //[UserButtonCode_resetTraining] -- add your button handler code here..
+        //[/UserButtonCode_resetTraining]
+    }
+
+    //[UserbuttonClicked_Post]
+    //[/UserbuttonClicked_Post]
 }
 
 void SalpaProcessorVisualizerContentComponent::sliderValueChanged (Slider* sliderThatWasMoved)
@@ -239,26 +259,6 @@ void SalpaProcessorVisualizerContentComponent::sliderValueChanged (Slider* slide
     //[/UsersliderValueChanged_Post]
 }
 
-void SalpaProcessorVisualizerContentComponent::buttonClicked (Button* buttonThatWasClicked)
-{
-    //[UserbuttonClicked_Pre]
-    //[/UserbuttonClicked_Pre]
-
-    if (buttonThatWasClicked == absenable)
-    {
-        //[UserButtonCode_absenable] -- add your button handler code here..
-        //[/UserButtonCode_absenable]
-    }
-    else if (buttonThatWasClicked == resetTraining)
-    {
-        //[UserButtonCode_resetTraining] -- add your button handler code here..
-        //[/UserButtonCode_resetTraining]
-    }
-
-    //[UserbuttonClicked_Post]
-    //[/UserbuttonClicked_Post]
-}
-
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
@@ -279,6 +279,14 @@ BEGIN_JUCER_METADATA
                  variableInitialisers="" snapPixels="8" snapActive="1" snapShown="1"
                  overlayOpacity="0.330" fixedSize="1" initialWidth="300" initialHeight="300">
   <BACKGROUND backgroundColour="ffffff"/>
+  <LABEL name="new label" id="3727047bd1062461" memberName="label6" virtualName=""
+         explicitFocusOrder="0" pos="0 125 200 22" edTextCol="ff000000"
+         edBkgCol="0" labelText="Absolute max. deviation" editableSingleClick="0"
+         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
+         fontsize="15" bold="0" italic="0" justification="33"/>
+  <TOGGLEBUTTON name="new toggle button" id="233d5ff191355d43" memberName="absenable"
+                virtualName="" explicitFocusOrder="0" pos="158 127 25 20" buttonText=""
+                connectedEdges="0" needsCallback="1" radioGroupId="0" state="0"/>
   <LABEL name="new label" id="13086f4fe30b5dfa" memberName="label" virtualName=""
          explicitFocusOrder="0" pos="0 0 200 20" edTextCol="ff000000"
          edBkgCol="0" labelText="Asymmetry window width" editableSingleClick="0"
@@ -302,11 +310,6 @@ BEGIN_JUCER_METADATA
   <LABEL name="new label" id="9d369357711b5590" memberName="label5" virtualName=""
          explicitFocusOrder="0" pos="0 100 200 21" edTextCol="ff000000"
          edBkgCol="0" labelText="Positive pegging threshold" editableSingleClick="0"
-         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
-         fontsize="15" bold="0" italic="0" justification="33"/>
-  <LABEL name="new label" id="3727047bd1062461" memberName="label6" virtualName=""
-         explicitFocusOrder="0" pos="0 125 200 22" edTextCol="ff000000"
-         edBkgCol="0" labelText="Absolute max. deviation" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
          fontsize="15" bold="0" italic="0" justification="33"/>
   <SLIDER name="asymdur" id="f85c73add7da17e4" memberName="asymdur" virtualName=""
@@ -339,9 +342,6 @@ BEGIN_JUCER_METADATA
           max="32700" int="100" style="IncDecButtons" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="70" textBoxHeight="20" skewFactor="1"
           needsCallback="1"/>
-  <TOGGLEBUTTON name="new toggle button" id="233d5ff191355d43" memberName="absenable"
-                virtualName="" explicitFocusOrder="0" pos="158 127 20 20" buttonText=""
-                connectedEdges="0" needsCallback="1" radioGroupId="0" state="0"/>
   <TEXTBUTTON name="resetTraining" id="a7adfa5e540555ed" memberName="resetTraining"
               virtualName="" explicitFocusOrder="0" pos="144 272 150 24" buttonText="Reset noise data"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>

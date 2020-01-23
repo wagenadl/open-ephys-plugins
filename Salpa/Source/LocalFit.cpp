@@ -421,13 +421,15 @@ void LocalFit::report() {
 	  state==FORCEPEG?"FORCEPEG":
           state==BLANKDEPEG?"BLANKDEP":
 	  "???");
-  std::cerr << "t_stream=" << t_stream;
+  std::cerr << " t_stream=" << t_stream;
   std::cerr << " t0=" << t0;
   std::cerr << " y[ts]=" << source[t_stream];
   std::cerr << " alpha=" << alpha0 << " " << alpha1
             << " " << alpha2 << " " << alpha3;
   std::cerr << " X=" << X0 << " " << X1
             << " " << X2 << " " << X3;
+  std::cerr << " y_thr=" << y_threshold;
+  std::cerr << " my_thr=" << my_thresh;
   std::cerr << "\n";
 }
 
@@ -437,6 +439,11 @@ void LocalFit::inirep() {
   std::cerr << " T2=" << T2;
   std::cerr << " T4=" << T4;
   std::cerr << " T6=" << T6;
+  std::cerr << " t_blank=" << t_blankdepeg;
+  std::cerr << " t_ahead=" << t_ahead;
+  std::cerr << " t_chi2=" << t_chi2;
+  std::cerr << " rail1=" << rail1;
+  std::cerr << " rail2=" << rail2;
 }
 
 int LocalFit::requireddelay() const {

@@ -44,15 +44,15 @@ SalpaProcessorEditor::SalpaProcessorEditor(SalpaProcessor* parentNode,
     //[OPENEPHYS_EDITOR_PRE_CONSTRUCTOR_SECTION_END]
 
     content.processor = parentNode;
-
-    content.relthr->setValue(parentNode->relthr);
-    content.tau->setValue(parentNode->tau);
-    content.lookahead->setValue(parentNode->t_ahead);
-    if (parentNode->eventchannel>=0)
-      content.eventChannel->setText(String(parentNode->eventchannel + 1));
-    else
-      content.eventChannel->setText("-");
-
+    printf("Filling salpa editor boxes\n");
+    // content.relthr->setValue(parentNode->relthr);
+    // content.tau->setValue(parentNode->tau);
+    // content.lookahead->setValue(parentNode->t_ahead);
+    // if (parentNode->eventchannel>=0)
+    //   content.eventChannel->setText(String(parentNode->eventchannel + 1));
+    // else
+    //   content.eventChannel->setText("-");
+    printf("Done filling salpa editor boxes\n");
     // should fill visualizer as well
 
 
@@ -70,6 +70,15 @@ SalpaProcessorEditor::~SalpaProcessorEditor()
 {
 }
 
+void SalpaProcessorEditor::updateGuiForParameter(int idx) {
+  SalpaProcessor *prc = content.processor;
+  switch (idx) {
+  case SalpaProcessor::PARAM_TAU:
+    content.tau->setValue(prc->tau);
+    break;
+    // etc.
+  }
+}
 
 void SalpaProcessorEditor::resized()
 {
