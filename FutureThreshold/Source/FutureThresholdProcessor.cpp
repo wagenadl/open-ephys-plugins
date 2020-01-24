@@ -149,8 +149,8 @@ void FutureThresholdProcessor::process(AudioSampleBuffer &buffer) {
   }
 
   int nSamples = /*buffer.getNumSamples(); //*/ getNumSamples(input_channel);
-  printf("nsamples = %i [%i] x %i\n", nSamples, getNumSamples(input_channel),
-         buffer.getNumChannels());
+  //printf("nsamples = %i [%i] x %i\n", nSamples, getNumSamples(input_channel),
+  //         buffer.getNumChannels());
   //         addEvents(events, TTL, n);
   float const *rp = buffer.getReadPointer(input_channel);
   juce::int64 startTs = getTimestamp(input_channel);
