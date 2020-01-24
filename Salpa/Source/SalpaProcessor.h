@@ -59,6 +59,7 @@ public:
     PARAM_T_ASYM=10,
     PARAM_EVENTCHANNEL=11,
     PARAM_V_ZERO=12,
+    PARAMETER_COUNT
   };
 public:
   SalpaProcessor();
@@ -72,6 +73,8 @@ public:
                    int samplePosition) override;
   void createEventChannels() override;
   void prepareToPlay(double sampleRate, int estimatedSamplesPerBlock) override;
+  void saveMyParameters(XmlElement *xml) const;
+  void loadMyParameters(XmlElement *xml);
 private:
   friend class SalpaProcessorEditor;
   friend class SalpaProcessorVisualizer;

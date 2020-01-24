@@ -45,13 +45,8 @@ SalpaProcessorEditor::SalpaProcessorEditor(SalpaProcessor* parentNode,
 
   content.processor = parentNode;
   printf("Filling salpa editor boxes\n");
-  content.relthr->setValue(parentNode->relthr);
-  content.tau->setValue(parentNode->tau);
-  content.lookahead->setValue(parentNode->t_ahead);
-  if (parentNode->eventchannel>=0)
-    content.eventChannel->setText(String(parentNode->eventchannel + 1));
-  else
-    content.eventChannel->setText("-");
+  for (int k=0; k<SalpaProcessor::PARAMETER_COUNT; k++)
+    reflectParameter(k);
   printf("Done filling salpa editor boxes\n");
   // should fill visualizer as well
 
@@ -136,35 +131,7 @@ void SalpaProcessorEditor::saveCustomParameters(XmlElement *xml) {
     printf("SALPAPROCESSOREDITOR - No PROCESSOR\n");
     return;
   }
-  XmlElement *mainNode = xml->createNewChildElement("VALUES");
-
-  auto saveParameter = [this, processor, mainNode](int idx, float value) {
-    auto parameter = processor->getParameterObject(idx);
-    mainNode->setAttribute(parameter->getName(), value);
-  };
-
-  saveParameter(SalpaProcessor::PARAM_V_NEG_RAIL, processor->v_neg_rail);
-  saveParameter(SalpaProcessor::PARAM_V_POS_RAIL, processor->v_pos_rail);
-  saveParameter(SalpaProcessor::PARAM_T_POTBLANK, processor->t_potblank);
-  saveParameter(SalpaProcessor::PARAM_T_BLANKDUR, processor->t_blankdur);
-  saveParameter(SalpaProcessor::PARAM_N_TOOPOOR, processor->n_toopoor);
-  saveParameter(SalpaProcessor::PARAM_T_AHEAD, processor->t_ahead);
-  saveParameter(SalpaProcessor::PARAM_TAU, processor->tau);
-  saveParameter(SalpaProcessor::PARAM_RELTHR, processor->relthr);
-  saveParameter(SalpaProcessor::PARAM_ABSTHR, processor->absthr);
-  saveParameter(SalpaProcessor::PARAM_USEABSTHR, processor->useabsthr);
-  saveParameter(SalpaProcessor::PARAM_T_ASYM, processor->t_asym);
-  saveParameter(SalpaProcessor::PARAM_EVENTCHANNEL, processor->eventchannel);
-  saveParameter(SalpaProcessor::PARAM_V_ZERO, processor->v_zero);
-}
-
-SalpaProcessorVisualizerContentComponent *SalpaProcessorEditor::visualizerContent() {
-  Visualizer *vis0 = canvas;
-  SalpaProcessorVisualizer *vis = dynamic_cast<SalpaProcessorVisualizer *>(vis0);
-  if (vis)
-    return &vis->content;
-  else
-    return 0;
+  processor->saveMyParameters(xml);
 }
 
 void SalpaProcessorEditor::loadCustomParameters(XmlElement *xml) {
@@ -174,80 +141,36 @@ void SalpaProcessorEditor::loadCustomParameters(XmlElement *xml) {
     printf("SALPAPROCESSOREDITOR - NO PROCESSOR\n");
     return;
   }
+  processor->loadMyParameters(xml);
+  for (int k=0; k<SalpaProcessor::PARAMETER_COUNT; k++)
+    reflectParameter(k);
+}
 
-  SalpaProcessorVisualizerContentComponent *viscont = visualizerContent();
-
-  bool ok = false;
-  forEachXmlChildElementWithTagName(*xml, mainNode, "VALUES") {
-    auto loadParameter = [this, processor, mainNode](int idx) {
-      auto parameter = processor->getParameterObject(idx);
-      return mainNode->getDoubleAttribute(parameter->getName());
-    };
-    ok = true;
-
-    float v_neg_rail = loadParameter(SalpaProcessor::PARAM_V_NEG_RAIL);
-    if (viscont)
-      viscont->negrail->setValue(v_neg_rail);
-    else
-      processor->setParameter(SalpaProcessor::PARAM_V_NEG_RAIL, v_neg_rail);
-
-    float v_pos_rail = loadParameter(SalpaProcessor::PARAM_V_POS_RAIL);
-    if (viscont)
-      viscont->posrail->setValue(v_pos_rail);
-    else
-      processor->setParameter(SalpaProcessor::PARAM_V_POS_RAIL, v_pos_rail);
-
-    float t_potblank = loadParameter(SalpaProcessor::PARAM_T_POTBLANK);
-    if (viscont)
-      viscont->potdur->setValue(t_potblank);
-    else
-      processor->setParameter(SalpaProcessor::PARAM_T_POTBLANK, t_potblank);
-
-    float t_blankdur = loadParameter(SalpaProcessor::PARAM_T_BLANKDUR);
-    if (viscont)
-      viscont->blankdur->setValue(t_blankdur);
-    else
-      processor->setParameter(SalpaProcessor::PARAM_T_BLANKDUR, t_blankdur);
-
-    // n_toopoor is not exposed to the gui
-
-    float t_ahead = loadParameter(SalpaProcessor::PARAM_T_AHEAD);
-    content.lookahead->setValue(t_ahead);
-
-    float tau = loadParameter(SalpaProcessor::PARAM_TAU);
-    content.tau->setValue(tau);
-
-    float relthr = loadParameter(SalpaProcessor::PARAM_RELTHR);
-    content.relthr->setValue(relthr);
-
-    float absthr = loadParameter(SalpaProcessor::PARAM_ABSTHR);
-    if (viscont)
-      viscont->digithr->setValue(absthr);
-    else
-      processor->setParameter(SalpaProcessor::PARAM_ABSTHR, absthr);
-
-    bool useabs = loadParameter(SalpaProcessor::PARAM_USEABSTHR);
-    if (viscont)
-      viscont->absenable->setToggleState(useabs, juce::sendNotification);
-    else
-      processor->setParameter(SalpaProcessor::PARAM_USEABSTHR, useabs);
-
-    float t_asym = loadParameter(SalpaProcessor::PARAM_T_ASYM);
-    if (viscont)
-      viscont->asymdur->setValue(t_asym);
-    else
-      processor->setParameter(SalpaProcessor::PARAM_T_ASYM, t_asym);
-
-    int evtch = loadParameter(SalpaProcessor::PARAM_EVENTCHANNEL);
-    if (evtch>=0)
-      content.eventChannel->setText(String(evtch + 1));
-    else
-      content.eventChannel->setText(String("-"));
-
-    // v_zero is not exposed to the gui
-
+void SalpaProcessorEditor::reflectParameter(int idx) {
+  SalpaProcessor *prc = content.processor;
+  if (!prc) {
+    printf("SALPAPROCESSOREDITOR - NO PROCESSOR\n");
+    return;
   }
-  if (!ok) {
-    printf("SALPAPROCESSOREDITOR - NO XML CONTENT\n");
+  switch (idx) {
+  case SalpaProcessor::PARAM_T_AHEAD:
+    content.lookahead->setValue(prc->t_ahead);
+    break;
+  case SalpaProcessor::PARAM_TAU:
+    content.tau->setValue(prc->tau);
+    break;
+  case SalpaProcessor::PARAM_RELTHR:
+    content.relthr->setValue(prc->relthr);
+    break;
+  case SalpaProcessor::PARAM_T_BLANKDUR:
+    content.blankdur->setValue(prc->t_blankdur);
+    break;
+  default: { // send other parameters to visualizer
+    Visualizer *vis0 = canvas;
+    SalpaProcessorVisualizer *vis
+      = dynamic_cast<SalpaProcessorVisualizer *>(vis0);
+    if (vis)
+      vis->reflectParameter(idx);
+  } break;
   }
 }

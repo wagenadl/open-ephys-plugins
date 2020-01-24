@@ -67,6 +67,8 @@ public:
     /** Called by an editor to initiate a parameter change.*/
     void setParameter (int, int, int, float) override;
 
+
+  void reflectParameter(int idx);
 private:
     // This component contains all components and graphics that were added using Projucer.
     // It's bounds initially have same bounds as the canvas itself.

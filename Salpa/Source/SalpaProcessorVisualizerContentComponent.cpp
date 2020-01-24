@@ -23,6 +23,7 @@
 
 #include "SalpaProcessorVisualizerContentComponent.h"
 
+
 //[MiscUserDefs] You can add your own user definitions and misc code here...
 //[/MiscUserDefs]
 
@@ -51,14 +52,6 @@ SalpaProcessorVisualizerContentComponent::SalpaProcessorVisualizerContentCompone
     label->setEditable (false, false, false);
     label->setColour (TextEditor::textColourId, Colours::black);
     label->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
-
-    addAndMakeVisible (label2 = new Label ("new label",
-                                           TRANS("Min. blank duration")));
-    label2->setFont (Font (15.00f, Font::plain));
-    label2->setJustificationType (Justification::centredLeft);
-    label2->setEditable (false, false, false);
-    label2->setColour (TextEditor::textColourId, Colours::black);
-    label2->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
     addAndMakeVisible (label3 = new Label ("new label",
                                            TRANS("Forced peg min. duration")));
@@ -90,13 +83,6 @@ SalpaProcessorVisualizerContentComponent::SalpaProcessorVisualizerContentCompone
     asymdur->setSliderStyle (Slider::IncDecButtons);
     asymdur->setTextBoxStyle (Slider::TextBoxLeft, false, 70, 20);
     asymdur->addListener (this);
-
-    addAndMakeVisible (blankdur = new Slider ("blankdur"));
-    blankdur->setTooltip (TRANS("\n"));
-    blankdur->setRange (1, 1000, 1);
-    blankdur->setSliderStyle (Slider::IncDecButtons);
-    blankdur->setTextBoxStyle (Slider::TextBoxLeft, false, 70, 20);
-    blankdur->addListener (this);
 
     addAndMakeVisible (potdur = new Slider ("potdur"));
     potdur->setTooltip (TRANS("\n"));
@@ -130,6 +116,33 @@ SalpaProcessorVisualizerContentComponent::SalpaProcessorVisualizerContentCompone
     resetTraining->setButtonText (TRANS("Reset noise data"));
     resetTraining->addListener (this);
 
+    addAndMakeVisible (labl2 = new Label ("new label",
+                                          TRANS("Peg on event")));
+    labl2->setTooltip (TRANS("Event channel for forced peg\n"));
+    labl2->setFont (Font (15.00f, Font::plain));
+    labl2->setJustificationType (Justification::centredLeft);
+    labl2->setEditable (false, false, false);
+    labl2->setColour (TextEditor::textColourId, Colours::black);
+    labl2->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+
+    addAndMakeVisible (eventChannel = new ComboBox ("eventChannel"));
+    eventChannel->setTooltip (TRANS("Event channel for forced peg\n"
+    "\n"));
+    eventChannel->setEditableText (false);
+    eventChannel->setJustificationType (Justification::centredLeft);
+    eventChannel->setTextWhenNothingSelected (String());
+    eventChannel->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
+    eventChannel->addItem (TRANS("-"), 1);
+    eventChannel->addItem (TRANS("1"), 2);
+    eventChannel->addItem (TRANS("2"), 3);
+    eventChannel->addItem (TRANS("3"), 4);
+    eventChannel->addItem (TRANS("4"), 5);
+    eventChannel->addItem (TRANS("5"), 6);
+    eventChannel->addItem (TRANS("6"), 7);
+    eventChannel->addItem (TRANS("7"), 8);
+    eventChannel->addItem (TRANS("8"), 9);
+    eventChannel->addListener (this);
+
 
     //[UserPreSize]
     //[/UserPreSize]
@@ -149,17 +162,17 @@ SalpaProcessorVisualizerContentComponent::~SalpaProcessorVisualizerContentCompon
     label6 = nullptr;
     absenable = nullptr;
     label = nullptr;
-    label2 = nullptr;
     label3 = nullptr;
     label4 = nullptr;
     label5 = nullptr;
     asymdur = nullptr;
-    blankdur = nullptr;
     potdur = nullptr;
     negrail = nullptr;
     posrail = nullptr;
     digithr = nullptr;
     resetTraining = nullptr;
+    labl2 = nullptr;
+    eventChannel = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -170,11 +183,9 @@ SalpaProcessorVisualizerContentComponent::~SalpaProcessorVisualizerContentCompon
 void SalpaProcessorVisualizerContentComponent::paint (Graphics& g)
 {
     //[UserPrePaint] Add your own custom painting code here..
-  printf("paint - %p\n", processor);
   GenericEditor *ed = processor->editor;
-  printf("paint --- %p\n", ed);
     ColourGradient editorBg = ed->getBackgroundGradient();
-    g.fillAll(editorBg.getColourAtPosition(0.5)); // roughly matches editor back    //[/UserPrePaint]
+    g.fillAll(editorBg.getColourAtPosition(0.5)); // roughly matches editor bac    //[/UserPrePaint]
 
     //[UserPaint] Add your own custom painting code here..
     //[/UserPaint]
@@ -188,17 +199,17 @@ void SalpaProcessorVisualizerContentComponent::resized()
     label6->setBounds (0, 125, 200, 22);
     absenable->setBounds (158, 127, 25, 20);
     label->setBounds (0, 0, 200, 20);
-    label2->setBounds (0, 25, 200, 20);
     label3->setBounds (0, 50, 200, 20);
     label4->setBounds (0, 75, 200, 21);
     label5->setBounds (0, 100, 200, 21);
     asymdur->setBounds (180, 2, 120, 20);
-    blankdur->setBounds (180, 27, 120, 20);
     potdur->setBounds (180, 52, 120, 20);
     negrail->setBounds (180, 77, 120, 20);
     posrail->setBounds (180, 102, 120, 20);
     digithr->setBounds (180, 127, 120, 20);
     resetTraining->setBounds (144, 272, 150, 24);
+    labl2->setBounds (0, 25, proportionOfWidth (0.5000f), 24);
+    eventChannel->setBounds (180, 25, 110, 20);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -238,13 +249,6 @@ void SalpaProcessorVisualizerContentComponent::sliderValueChanged (Slider* slide
                               sliderThatWasMoved->getValue());
         //[/UserSliderCode_asymdur]
     }
-    else if (sliderThatWasMoved == blankdur)
-    {
-        //[UserSliderCode_blankdur] -- add your slider handling code here..
-      processor->setParameter(SalpaProcessor::PARAM_T_BLANKDUR,
-                              sliderThatWasMoved->getValue());
-        //[/UserSliderCode_blankdur]
-    }
     else if (sliderThatWasMoved == potdur)
     {
         //[UserSliderCode_potdur] -- add your slider handling code here..
@@ -276,6 +280,25 @@ void SalpaProcessorVisualizerContentComponent::sliderValueChanged (Slider* slide
 
     //[UsersliderValueChanged_Post]
     //[/UsersliderValueChanged_Post]
+}
+
+void SalpaProcessorVisualizerContentComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
+{
+    //[UsercomboBoxChanged_Pre]
+  if (!processor)
+    return;
+  String s = comboBoxThatHasChanged->getText();
+  int ch = s.getIntValue() - 1;
+    //[/UsercomboBoxChanged_Pre]
+
+    if (comboBoxThatHasChanged == eventChannel)
+    {
+        //[UserComboBoxCode_eventChannel] -- add your combo box handling code here..
+      processor->setParameter(SalpaProcessor::PARAM_EVENTCHANNEL, ch);        //[/UserComboBoxCode_eventChannel]
+    }
+
+    //[UsercomboBoxChanged_Post]
+    //[/UsercomboBoxChanged_Post]
 }
 
 
@@ -311,11 +334,6 @@ BEGIN_JUCER_METADATA
          edBkgCol="0" labelText="Asymmetry window width" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
          fontsize="15" bold="0" italic="0" justification="33"/>
-  <LABEL name="new label" id="b1a676d8a0b634a1" memberName="label2" virtualName=""
-         explicitFocusOrder="0" pos="0 25 200 20" edTextCol="ff000000"
-         edBkgCol="0" labelText="Min. blank duration" editableSingleClick="0"
-         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
-         fontsize="15" bold="0" italic="0" justification="33"/>
   <LABEL name="new label" id="4375229ef2bdd986" memberName="label3" virtualName=""
          explicitFocusOrder="0" pos="0 50 200 20" edTextCol="ff000000"
          edBkgCol="0" labelText="Forced peg min. duration" editableSingleClick="0"
@@ -333,11 +351,6 @@ BEGIN_JUCER_METADATA
          fontsize="15" bold="0" italic="0" justification="33"/>
   <SLIDER name="asymdur" id="f85c73add7da17e4" memberName="asymdur" virtualName=""
           explicitFocusOrder="0" pos="180 2 120 20" tooltip="&#10;" min="1"
-          max="1000" int="1" style="IncDecButtons" textBoxPos="TextBoxLeft"
-          textBoxEditable="1" textBoxWidth="70" textBoxHeight="20" skewFactor="1"
-          needsCallback="1"/>
-  <SLIDER name="blankdur" id="4fb4512ccfd726e0" memberName="blankdur" virtualName=""
-          explicitFocusOrder="0" pos="180 27 120 20" tooltip="&#10;" min="1"
           max="1000" int="1" style="IncDecButtons" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="70" textBoxHeight="20" skewFactor="1"
           needsCallback="1"/>
@@ -364,6 +377,15 @@ BEGIN_JUCER_METADATA
   <TEXTBUTTON name="resetTraining" id="a7adfa5e540555ed" memberName="resetTraining"
               virtualName="" explicitFocusOrder="0" pos="144 272 150 24" buttonText="Reset noise data"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
+  <LABEL name="new label" id="488849cd5032876a" memberName="labl2" virtualName=""
+         explicitFocusOrder="0" pos="0 25 50% 24" tooltip="Event channel for forced peg&#10;"
+         edTextCol="ff000000" edBkgCol="0" labelText="Peg on event" editableSingleClick="0"
+         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
+         fontsize="15" bold="0" italic="0" justification="33"/>
+  <COMBOBOX name="eventChannel" id="2155ac33a250d3db" memberName="eventChannel"
+            virtualName="" explicitFocusOrder="0" pos="180 25 110 20" tooltip="Event channel for forced peg&#10;&#10;"
+            editable="0" layout="33" items="-&#10;1&#10;2&#10;3&#10;4&#10;5&#10;6&#10;7&#10;8"
+            textWhenNonSelected="" textWhenNoItems="(no choices)"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

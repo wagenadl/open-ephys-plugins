@@ -77,12 +77,12 @@ public:
     //void updateSettings();
   void saveCustomParameters(XmlElement* xml) override;
   void loadCustomParameters(XmlElement* xml) override;
+  void reflectParameter(int idx);
 private:
     // This component contains all components and graphics that were added using Projucer.
     // It's bounds initially the same bounds as the gray workspace (but only till the drawerButton for X)
     SalpaProcessorContentComponent content;
 private:
-  class SalpaProcessorVisualizerContentComponent *visualizerContent(); // may be null
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SalpaProcessorEditor);
 };
 

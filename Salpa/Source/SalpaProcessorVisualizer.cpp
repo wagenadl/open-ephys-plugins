@@ -34,15 +34,8 @@ SalpaProcessorVisualizer::SalpaProcessorVisualizer(SalpaProcessor *proc) {
   addAndMakeVisible (&content);
 
   //[OPENEPHYS_EDITOR_PRE_CONSTRUCTOR_SECTION_END]
-
-  content.asymdur->setValue(proc->t_asym);
-  content.blankdur->setValue(proc->t_blankdur);
-  content.potdur->setValue(proc->t_potblank);
-  content.negrail->setValue(proc->v_neg_rail);
-  content.posrail->setValue(proc->v_pos_rail);
-  content.digithr->setValue(proc->absthr);
-  content.absenable->setToggleState(proc->useabsthr ? true : false,
-                                    juce::dontSendNotification);
+  for (int k=0; k<SalpaProcessor::PARAMETER_COUNT; k++)
+    reflectParameter(k);
 }
 
 SalpaProcessorVisualizer::~SalpaProcessorVisualizer() {
@@ -75,4 +68,49 @@ void SalpaProcessorVisualizer::setParameter(int parameter, float newValue) {
 void SalpaProcessorVisualizer::setParameter (int parameter,
                                              int val1, int val2,
                                              float newValue) {
+}
+
+void SalpaProcessorVisualizer::reflectParameter(int idx) {
+  SalpaProcessor *prc = content.processor;
+  if (!prc) {
+    printf("SALPAPROCESSORVISUALIZER - NO PROCESSOR\n");
+    return;
+  }
+  switch (idx) {
+  case SalpaProcessor::PARAM_V_NEG_RAIL:
+    content.negrail->setValue(prc->v_neg_rail);
+    break;
+  case SalpaProcessor::PARAM_V_POS_RAIL:
+    content.posrail->setValue(prc->v_pos_rail);
+    break;
+  case SalpaProcessor::PARAM_T_POTBLANK:
+    content.potdur->setValue(prc->t_potblank);
+    break;
+  case SalpaProcessor::PARAM_N_TOOPOOR:
+    // n_toopoor is not exposed to the gui
+    break;
+  case SalpaProcessor::PARAM_ABSTHR:
+    content.digithr->setValue(prc->absthr);
+    break;
+  case SalpaProcessor::PARAM_USEABSTHR:
+      content.absenable->setToggleState(prc->useabsthr,
+                                        juce::sendNotification);
+    break;
+  case SalpaProcessor::PARAM_T_ASYM:
+    content.asymdur->setValue(prc->t_asym);
+    break;
+  case SalpaProcessor::PARAM_EVENTCHANNEL: {
+    int evtch = prc->eventchannel;
+    if (evtch>=0)
+      content.eventChannel->setText(String(evtch + 1));
+    else
+      content.eventChannel->setText(String("-"));
+  } break;
+  case SalpaProcessor::PARAM_V_ZERO:
+    // v_zero is not exposed to the gui
+    break;
+  default:
+    printf("SALPAPROCESSORVISUALIZER - UNKNOWN PARAMETER INDEX %i\n", idx);
+    break;
+  }
 }

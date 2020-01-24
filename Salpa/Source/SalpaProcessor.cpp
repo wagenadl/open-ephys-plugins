@@ -122,7 +122,7 @@ AudioProcessorEditor* SalpaProcessor::createEditor() {
 }
 
 void SalpaProcessor::setParameter(int idx, float val) {
-  printf("salpa set param %i %g\n", idx, val);
+  //  printf("salpa set param %i %g\n", idx, val);
   GenericProcessor::setParameter(idx, val);
   editor->updateParameterButtons(idx); // ?
   switch (idx) {
@@ -173,15 +173,15 @@ void SalpaProcessor::train(AudioSampleBuffer &buffer) {
   printf("SALPA: train\n");
   noise.train(buffer, getNumSamples(0));
   if (noise.chunks() >= TRAINCHUNKS) {
-    printf("SALPA: done training\n");
+    //printf("SALPA: done training\n");
     noise.makeready();
-    for (int n=0; n<fitters.size(); n++)
-      printf("noise[%i] = %g\n", n, noise.std(n));
+    //for (int n=0; n<fitters.size(); n++)
+    //  printf("noise[%i] = %g\n", n, noise.std(n));
     if (!useabsthr)
       for (int n=0; n<fitters.size(); n++)
         fitters[n]->setthreshold(relthr * noise.std(n));
   } else {
-    printf("SALPA: more training required (%i)\n", noise.chunks());
+    //    printf("SALPA: more training required (%i)\n", noise.chunks());
   }
 }
 
@@ -229,11 +229,10 @@ void SalpaProcessor::prepareToPlay(double sampleRate, int estimatedSamplesPerBlo
 
 void SalpaProcessor::process(AudioSampleBuffer &buffer) {
   juce::int64 startTs = getTimestamp(0);
-  printf("SALPA: process: %Li\n", startTs);
-  if (eventchannel>=0) {
-    t0 = startTs;
+  //  printf("SALPA: process: %Li\n", startTs);
+  t0 = startTs;
+  if (eventchannel>=0) 
     checkForEvents();
-  }
   if (!noise.isready())
     train(buffer);
 
@@ -271,8 +270,8 @@ void SalpaProcessor::process(AudioSampleBuffer &buffer) {
     while (!forcestarts.empty()) {
       timeref_t tfrom = forcestarts.front();
       timeref_t tto = forceends.front();
-      printf("forcepeg %li - %li [%li - %li]\n",
-             tfrom, tto, t0, tlim);
+      //printf("forcepeg %li - %li [%li - %li]\n",
+      //     tfrom, tto, t0, tlim);
       if (tto <= tlim) {
         for (int c=0; c<nChannels; c++)
           fitters[c]->forcepeg(tfrom, tto);
@@ -301,7 +300,7 @@ void SalpaProcessor::process(AudioSampleBuffer &buffer) {
       samplePtr[n] = outbuf[t0 - delay + n];
   }
 
-  fitters[0]->report();
+  //  fitters[0]->report();
 }
 
 void SalpaProcessor::handleEvent(EventChannel const *eventInfo,
@@ -312,7 +311,7 @@ void SalpaProcessor::handleEvent(EventChannel const *eventInfo,
     int id = ttl->getState() ? 1 : 0;
     int ch = ttl->getChannel();
     int t = samplePosition;
-    printf("Salpa: event id %i channel %i time %i / %i\n", id, ch, t, eventchannel);
+    //printf("Salpa: event id %i channel %i time %i / %i\n", id, ch, t, eventchannel);
     if (id and ch==eventchannel) {
       forcestarts.push(t + t0);
       forceends.push(t + t0 + t_potblank);
@@ -365,4 +364,47 @@ void SalpaProcessor::createEventChannels() {
   chan->setIdentifier("salpa.event");
 
   eventChannelPtr = eventChannelArray.add(chan);
+}
+
+void SalpaProcessor::saveMyParameters(XmlElement *xml) const {
+  XmlElement *mainNode = xml->createNewChildElement("VALUES");
+
+  auto saveParameter = [this, mainNode](int idx, float value) {
+    auto parameter = getParameterObject(idx);
+    mainNode->setAttribute(parameter->getName(), value);
+  };
+
+  saveParameter(PARAM_V_NEG_RAIL, v_neg_rail);
+  saveParameter(PARAM_V_POS_RAIL, v_pos_rail);
+  saveParameter(PARAM_T_POTBLANK, t_potblank);
+  saveParameter(PARAM_T_BLANKDUR, t_blankdur);
+  saveParameter(PARAM_N_TOOPOOR, n_toopoor);
+  saveParameter(PARAM_T_AHEAD, t_ahead);
+  saveParameter(PARAM_TAU, tau);
+  saveParameter(PARAM_RELTHR, relthr);
+  saveParameter(PARAM_ABSTHR, absthr);
+  saveParameter(PARAM_USEABSTHR, useabsthr);
+  saveParameter(PARAM_T_ASYM, t_asym);
+  saveParameter(PARAM_EVENTCHANNEL, eventchannel);
+  saveParameter(PARAM_V_ZERO, v_zero);
+  printf("Salpa - save my parameters\n");
+}
+
+void SalpaProcessor::loadMyParameters(XmlElement *xml) {
+  bool ok = false;
+  forEachXmlChildElementWithTagName(*xml, mainNode, "VALUES") {
+    auto loadParameter = [this, mainNode](int idx) {
+      auto parameter = getParameterObject(idx);
+      return mainNode->getDoubleAttribute(parameter->getName());
+    };
+    ok = true;
+    for (int k=0; k<PARAMETER_COUNT; k++) {
+      auto paramobj = getParameterObject(k);
+      float value = mainNode->getDoubleAttribute(paramobj->getName());
+      setParameter(k, value);
+    }
+    //    printf("Salpa - load my parameters\n");
+  }
+  if (!ok) 
+    printf("SALPAPROCESSOR - NO XML CONTENT\n");
 }

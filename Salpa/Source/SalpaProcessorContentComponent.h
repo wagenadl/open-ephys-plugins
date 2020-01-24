@@ -35,8 +35,7 @@
                                                                     //[/Comments]
 */
 class SalpaProcessorContentComponent  : public Component,
-                                        public SliderListener,
-                                        public ComboBoxListener
+                                        public SliderListener
 {
 public:
     //==============================================================================
@@ -45,12 +44,12 @@ public:
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
+  bool reflectParameter(int idx); // true if contained here
     //[/UserMethods]
 
     void paint (Graphics& g) override;
     void resized() override;
     void sliderValueChanged (Slider* sliderThatWasMoved) override;
-    void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
 
 
 
@@ -67,11 +66,11 @@ private:
     ScopedPointer<Label> label;
     ScopedPointer<Label> label2;
     ScopedPointer<Label> label3;
-    ScopedPointer<Label> labl2;
     ScopedPointer<Slider> tau;
     ScopedPointer<Slider> relthr;
     ScopedPointer<Slider> lookahead;
-    ScopedPointer<ComboBox> eventChannel;
+    ScopedPointer<Label> label4;
+    ScopedPointer<Slider> blankdur;
 
 
     //==============================================================================

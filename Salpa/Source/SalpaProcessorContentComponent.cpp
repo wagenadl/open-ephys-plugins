@@ -61,15 +61,6 @@ SalpaProcessorContentComponent::SalpaProcessorContentComponent ()
     label3->setColour (TextEditor::textColourId, Colours::black);
     label3->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    addAndMakeVisible (labl2 = new Label ("new label",
-                                          TRANS("Peg on event")));
-    labl2->setTooltip (TRANS("Event channel for forced peg\n"));
-    labl2->setFont (Font (15.00f, Font::plain));
-    labl2->setJustificationType (Justification::centredLeft);
-    labl2->setEditable (false, false, false);
-    labl2->setColour (TextEditor::textColourId, Colours::black);
-    labl2->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
-
     addAndMakeVisible (tau = new Slider ("tau"));
     tau->setTooltip (TRANS("Time constant (samples)"));
     tau->setRange (1, 1000, 1);
@@ -91,23 +82,23 @@ SalpaProcessorContentComponent::SalpaProcessorContentComponent ()
     lookahead->setTextBoxStyle (Slider::TextBoxLeft, false, 35, 20);
     lookahead->addListener (this);
 
-    addAndMakeVisible (eventChannel = new ComboBox ("eventChannel"));
-    eventChannel->setTooltip (TRANS("Event channel for forced peg\n"
-    "\n"));
-    eventChannel->setEditableText (false);
-    eventChannel->setJustificationType (Justification::centredLeft);
-    eventChannel->setTextWhenNothingSelected (String());
-    eventChannel->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
-    eventChannel->addItem (TRANS("-"), 1);
-    eventChannel->addItem (TRANS("1"), 2);
-    eventChannel->addItem (TRANS("2"), 3);
-    eventChannel->addItem (TRANS("3"), 4);
-    eventChannel->addItem (TRANS("4"), 5);
-    eventChannel->addItem (TRANS("5"), 6);
-    eventChannel->addItem (TRANS("6"), 7);
-    eventChannel->addItem (TRANS("7"), 8);
-    eventChannel->addItem (TRANS("8"), 9);
-    eventChannel->addListener (this);
+    addAndMakeVisible (label4 = new Label ("new label",
+                                           TRANS("Post blank")));
+    label4->setTooltip (TRANS("Post-artifact additional blanking \n"
+    "(samples)\n"));
+    label4->setFont (Font (15.00f, Font::plain));
+    label4->setJustificationType (Justification::centredLeft);
+    label4->setEditable (false, false, false);
+    label4->setColour (TextEditor::textColourId, Colours::black);
+    label4->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+
+    addAndMakeVisible (blankdur = new Slider ("blankdur"));
+    blankdur->setTooltip (TRANS("Post-artifact additional blanking \n"
+    "(samples)\n"));
+    blankdur->setRange (1, 200, 1);
+    blankdur->setSliderStyle (Slider::IncDecButtons);
+    blankdur->setTextBoxStyle (Slider::TextBoxLeft, false, 35, 20);
+    blankdur->addListener (this);
 
 
     //[UserPreSize]
@@ -128,11 +119,11 @@ SalpaProcessorContentComponent::~SalpaProcessorContentComponent()
     label = nullptr;
     label2 = nullptr;
     label3 = nullptr;
-    labl2 = nullptr;
     tau = nullptr;
     relthr = nullptr;
     lookahead = nullptr;
-    eventChannel = nullptr;
+    label4 = nullptr;
+    blankdur = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -157,11 +148,11 @@ void SalpaProcessorContentComponent::resized()
     label->setBounds (0, proportionOfHeight (0.0000f), proportionOfWidth (0.5000f), 24);
     label2->setBounds (0, proportionOfHeight (0.2500f), proportionOfWidth (0.5000f), 24);
     label3->setBounds (0, proportionOfHeight (0.5000f), proportionOfWidth (0.5000f), 24);
-    labl2->setBounds (0, proportionOfHeight (0.7500f), proportionOfWidth (0.5000f), 24);
     tau->setBounds (proportionOfWidth (1.0000f) - proportionOfWidth (0.5000f), proportionOfHeight (0.0200f), proportionOfWidth (0.5000f), 20);
     relthr->setBounds (proportionOfWidth (1.0000f) - proportionOfWidth (0.5000f), proportionOfHeight (0.2700f), proportionOfWidth (0.5000f), 20);
     lookahead->setBounds (proportionOfWidth (1.0000f) - proportionOfWidth (0.5000f), proportionOfHeight (0.5200f), proportionOfWidth (0.5000f), 20);
-    eventChannel->setBounds (proportionOfWidth (1.0000f) - proportionOfWidth (0.5000f), proportionOfHeight (0.7700f), proportionOfWidth (0.5000f), 20);
+    label4->setBounds (0, proportionOfHeight (0.7500f), proportionOfWidth (0.5000f), 24);
+    blankdur->setBounds (proportionOfWidth (1.0000f) - proportionOfWidth (0.5000f), proportionOfHeight (0.7500f), proportionOfWidth (0.5000f), 20);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -169,55 +160,41 @@ void SalpaProcessorContentComponent::resized()
 void SalpaProcessorContentComponent::sliderValueChanged (Slider* sliderThatWasMoved)
 {
     //[UsersliderValueChanged_Pre]
+  if (!processor)
+    return;
     //[/UsersliderValueChanged_Pre]
 
     if (sliderThatWasMoved == tau)
     {
         //[UserSliderCode_tau] -- add your slider handling code here..
-      if (processor)
-        processor->setParameter(SalpaProcessor::PARAM_TAU,
-                                sliderThatWasMoved->getValue());
+      processor->setParameter(SalpaProcessor::PARAM_TAU,
+                              sliderThatWasMoved->getValue());
         //[/UserSliderCode_tau]
     }
     else if (sliderThatWasMoved == relthr)
     {
         //[UserSliderCode_relthr] -- add your slider handling code here..
-      if (processor)
-        processor->setParameter(SalpaProcessor::PARAM_RELTHR,
-                                sliderThatWasMoved->getValue());
+      processor->setParameter(SalpaProcessor::PARAM_RELTHR,
+                              sliderThatWasMoved->getValue());
         //[/UserSliderCode_relthr]
     }
     else if (sliderThatWasMoved == lookahead)
     {
         //[UserSliderCode_lookahead] -- add your slider handling code here..
-      if (processor)
-        processor->setParameter(SalpaProcessor::PARAM_T_AHEAD,
-                                sliderThatWasMoved->getValue());
+      processor->setParameter(SalpaProcessor::PARAM_T_AHEAD,
+                              sliderThatWasMoved->getValue());
         //[/UserSliderCode_lookahead]
+    }
+    else if (sliderThatWasMoved == blankdur)
+    {
+        //[UserSliderCode_blankdur] -- add your slider handling code here..
+      processor->setParameter(SalpaProcessor::PARAM_T_BLANKDUR,
+                              sliderThatWasMoved->getValue());
+        //[/UserSliderCode_blankdur]
     }
 
     //[UsersliderValueChanged_Post]
     //[/UsersliderValueChanged_Post]
-}
-
-void SalpaProcessorContentComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
-{
-    //[UsercomboBoxChanged_Pre]
-  String s = comboBoxThatHasChanged->getText();
-  int ch = s.getIntValue() - 1;
-    //[/UsercomboBoxChanged_Pre]
-
-    if (comboBoxThatHasChanged == eventChannel)
-    {
-        //[UserComboBoxCode_eventChannel] -- add your combo box handling code here..
-      if (processor)
-        processor->setParameter(SalpaProcessor::PARAM_EVENTCHANNEL, ch);
-
-        //[/UserComboBoxCode_eventChannel]
-    }
-
-    //[UsercomboBoxChanged_Post]
-    //[/UsercomboBoxChanged_Post]
 }
 
 
@@ -255,11 +232,6 @@ BEGIN_JUCER_METADATA
          edTextCol="ff000000" edBkgCol="0" labelText="Look ahead" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
          fontsize="15" bold="0" italic="0" justification="33"/>
-  <LABEL name="new label" id="488849cd5032876a" memberName="labl2" virtualName=""
-         explicitFocusOrder="0" pos="0 75% 50% 24" tooltip="Event channel for forced peg&#10;"
-         edTextCol="ff000000" edBkgCol="0" labelText="Peg on event" editableSingleClick="0"
-         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
-         fontsize="15" bold="0" italic="0" justification="33"/>
   <SLIDER name="tau" id="f85c73add7da17e4" memberName="tau" virtualName=""
           explicitFocusOrder="0" pos="100%r 2% 50% 20" tooltip="Time constant (samples)"
           min="1" max="1000" int="1" style="IncDecButtons" textBoxPos="TextBoxLeft"
@@ -275,11 +247,16 @@ BEGIN_JUCER_METADATA
           tooltip="Look ahead (samples)&#10;" min="1" max="200" int="1"
           style="IncDecButtons" textBoxPos="TextBoxLeft" textBoxEditable="1"
           textBoxWidth="35" textBoxHeight="20" skewFactor="1" needsCallback="1"/>
-  <COMBOBOX name="eventChannel" id="2155ac33a250d3db" memberName="eventChannel"
-            virtualName="" explicitFocusOrder="0" pos="100%r 77% 50% 20"
-            tooltip="Event channel for forced peg&#10;&#10;" editable="0"
-            layout="33" items="-&#10;1&#10;2&#10;3&#10;4&#10;5&#10;6&#10;7&#10;8"
-            textWhenNonSelected="" textWhenNoItems="(no choices)"/>
+  <LABEL name="new label" id="accf2126b817f9ba" memberName="label4" virtualName=""
+         explicitFocusOrder="0" pos="0 75% 50% 24" tooltip="Post-artifact additional blanking &#10;(samples)&#10;"
+         edTextCol="ff000000" edBkgCol="0" labelText="Post blank" editableSingleClick="0"
+         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
+         fontsize="15" bold="0" italic="0" justification="33"/>
+  <SLIDER name="blankdur" id="75a212c460f3d2d4" memberName="blankdur" virtualName=""
+          explicitFocusOrder="0" pos="100%r 75% 50% 20" tooltip="Post-artifact additional blanking &#10;(samples)&#10;"
+          min="1" max="200" int="1" style="IncDecButtons" textBoxPos="TextBoxLeft"
+          textBoxEditable="1" textBoxWidth="35" textBoxHeight="20" skewFactor="1"
+          needsCallback="1"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

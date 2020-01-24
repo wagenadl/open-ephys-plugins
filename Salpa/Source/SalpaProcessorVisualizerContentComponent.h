@@ -36,7 +36,8 @@
 */
 class SalpaProcessorVisualizerContentComponent  : public Component,
                                                   public ButtonListener,
-                                                  public SliderListener
+                                                  public SliderListener,
+                                                  public ComboBoxListener
 {
 public:
     //==============================================================================
@@ -51,6 +52,7 @@ public:
     void resized() override;
     void buttonClicked (Button* buttonThatWasClicked) override;
     void sliderValueChanged (Slider* sliderThatWasMoved) override;
+    void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
 
 
 
@@ -68,17 +70,17 @@ private:
     ScopedPointer<Label> label6;
     ScopedPointer<ToggleButton> absenable;
     ScopedPointer<Label> label;
-    ScopedPointer<Label> label2;
     ScopedPointer<Label> label3;
     ScopedPointer<Label> label4;
     ScopedPointer<Label> label5;
     ScopedPointer<Slider> asymdur;
-    ScopedPointer<Slider> blankdur;
     ScopedPointer<Slider> potdur;
     ScopedPointer<Slider> negrail;
     ScopedPointer<Slider> posrail;
     ScopedPointer<Slider> digithr;
     ScopedPointer<TextButton> resetTraining;
+    ScopedPointer<Label> labl2;
+    ScopedPointer<ComboBox> eventChannel;
 
 
     //==============================================================================

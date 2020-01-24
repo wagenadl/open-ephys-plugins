@@ -25,7 +25,7 @@
 #ifndef THIRDORDER
 #define THIRDORDER 1
 #endif
-#define PREMATURE 1
+#define PREMATURE 0
 
 #include <math.h>
 
@@ -156,9 +156,6 @@ LocalFit::State LocalFit::statemachine(timeref_t t_limit, State s) {
     calc_X012(); calc_X3();
     calc_alpha0123();
     toopoorcnt=TOOPOORCNT;
-#if TEST
-    t_depeg = t_stream;
-#endif
     goto l_TOOPOOR;
   }
 
@@ -194,21 +191,11 @@ LocalFit::State LocalFit::statemachine(timeref_t t_limit, State s) {
       int dt2=dt*dt;
       int dt3=dt*dt2;
       negv =  source[t_stream] < raw_t(alpha0 + alpha1*dt + alpha2*dt2 + alpha3*dt3);
-#endif
-
-#ifdef TEST
-      int_t x0=X0,x1=X1,x2=X2,x3=X3;
-#endif
+#endif // PREMATURE
       calc_X012(); calc_X3(); // for numerical stability problem!
-#ifdef TEST
-      if (x0!=X0 || x1!=X1 || x2!=X2 || x3!=X3)
-	fprintf(stderr,"CUMULANT ERROR: X=[%Li %Li %Li %Li] dx=[%Li %Li %Li %Li] (hw=%i, t=%.2f, dt=%Li, C=%Li)\n",
-		X0,X1,X2,X3,X0-x0,X1-x1,X2-x2,X3-x3,source.hw,t_stream/25.0,t_stream-t_depeg,t_stream-t_check);
-      t_check=t_stream;
-#endif
       goto l_BLANKDEPEG;
     }
-#else
+#else // ASYM_NOT_CHI2 is false
     real_t chi2=0;
     for (int i=0; i<t_chi2; i++) {
       int t_i = t_stream+t_blankdepeg+i;
@@ -226,10 +213,10 @@ LocalFit::State LocalFit::statemachine(timeref_t t_limit, State s) {
       int dt2= dt*dt;
       int dt3= dt*dt2;
       negv = source[t_stream] < raw_t(alpha0 + alpha1*dt + alpha2*dt2 + alpha3*dt3);
-#endif
+#endif // PREMATURE
       goto l_BLANKDEPEG;
     }
-#endif
+#endif // ASYM_NOT_CHI2
 
 //    int dt=t_stream-t0; int dt2=dt*dt; int dt3=dt*dt2;
 //    dest[t_stream]=source[t_stream]-int(alpha0 + alpha1*dt + alpha2*dt2 + alpha3*dt3);
@@ -240,16 +227,7 @@ LocalFit::State LocalFit::statemachine(timeref_t t_limit, State s) {
       goto l_FORCEPEG;
     }
     update_X0123();
-#ifdef TEST
-      int_t x0=X0,x1=X1,x2=X2,x3=X3;
-#endif
-      calc_X012(); calc_X3(); // for numerical stability problem!
-#ifdef TEST
-      if (x0!=X0 || x1!=X1 || x2!=X2 || x3!=X3)
-	fprintf(stderr,"Cumulant error: X=[%Li %Li %Li %Li] dx=[%Li %Li %Li %Li] (hw=%i, t=%.2f, dt=%Li, C=%Li)\n",
-		X0,X1,X2,X3,X0-x0,X1-x1,X2-x2,X3-x3,source.hw,t_stream/25.0,t_stream-t_depeg,t_stream-t_check);
-      t_check=t_stream;
-#endif
+    calc_X012(); calc_X3(); // for numerical stability problem!
     calc_alpha0123();
     goto l_TOOPOOR;
   }
@@ -271,6 +249,7 @@ LocalFit::State LocalFit::statemachine(timeref_t t_limit, State s) {
 
 //////////////////////////////////////////////////
  l_BLANKDEPEG: {
+    //printf("BLANKDEPEG %Li %Li %Li\n", t_stream, t_limit, t0 - tau + t_blankdepeg);
     if (t_stream>=t_limit)
       return BLANKDEPEG;
     if (t_stream >= t0-tau+t_blankdepeg)
@@ -279,15 +258,23 @@ LocalFit::State LocalFit::statemachine(timeref_t t_limit, State s) {
     int dt=t_stream-t0;
     int dt2=dt*dt;
     int dt3=dt*dt2;
-    raw_t y = source[t_stream] - raw_t(alpha0 + alpha1*dt + alpha2*dt2 + alpha3*dt3);
+    raw_t y = source[t_stream]
+      - raw_t(alpha0 + alpha1*dt + alpha2*dt2 + alpha3*dt3);
     if ((y<0) != negv) {
-      dest[t_stream] = y;
-      t_stream++;
       goto l_DEPEGGING;
     }
 #endif
     dest[t_stream] = 0;
     t_stream++;
+    if (ispegged(source[t_stream+tau+t_ahead])) {
+      t0=t_stream-1;
+      calc_X3();
+      calc_alpha0123();
+      goto l_PEGGING;
+    } 
+    if (t_stream>t0) {
+      update_X012();
+    }
     goto l_BLANKDEPEG;
   }
 
@@ -297,17 +284,7 @@ LocalFit::State LocalFit::statemachine(timeref_t t_limit, State s) {
  l_DEPEGGING: {
     if (t_stream>=t_limit)
       return DEPEGGING;
-#if TEST
-    if (t_depeg) {
-      fprintf(stderr,"%i %.5f %.2f\n",
-	      source.hw,
-	      t_stream/(1000.*FREQKHZ),
-	      (t_stream-t_depeg)/(1.*FREQKHZ));
-      // fprintf(stderr,"Lost time: %.2f ms on %i\n",(t_stream-t_depeg)/25.,source.hw);
-      t_depeg=0;
-    }
-#endif
-    if (t_stream==t0) {
+    if (t_stream>=t0) {
       goto l_OK;
     }
     int dt=t_stream-t0;
@@ -417,7 +394,7 @@ void LocalFit::report() {
 	  state==PEGGING?"PEGGING":
 	  state==PEGGED?"PEGGED":
 	  state==TOOPOOR?"TOOPOOR":
-	  state==DEPEGGING?"DEPGGING":
+	  state==DEPEGGING?"DEPEGGING":
 	  state==FORCEPEG?"FORCEPEG":
           state==BLANKDEPEG?"BLANKDEP":
 	  "???");
@@ -447,13 +424,5 @@ void LocalFit::inirep() {
 }
 
 int LocalFit::requireddelay() const {
-  int del = 2*tau;
-  auto maxer = [&del](int dt) {
-    if (dt > del)
-      del = dt;
-  };
-  maxer(t_chi2);
-  maxer(tau + t_ahead);
-  maxer(tau + t_blankdepeg);
-  return del;
+  return 2*tau + t_ahead + t_chi2 + t_blankdepeg + 10;
 }
