@@ -40,7 +40,7 @@ public:
   T &operator[](timeref_t t) { return data_[t&mask]; }
   T *wheretowrite() { return data_ + (latest_&mask); }
   void donewriting(int n) { latest_ += n; }
-  void reset() { latest_=0; }
+  void reset(timeref_t t=0) { latest_=t; }
 private:
   std::vector<T> vec;
   T *data_;

@@ -122,7 +122,7 @@ AudioProcessorEditor* SalpaProcessor::createEditor() {
 }
 
 void SalpaProcessor::setParameter(int idx, float val) {
-  //  printf("salpa set param %i %g\n", idx, val);
+  printf("salpa set param %i %g\n", idx, val);
   GenericProcessor::setParameter(idx, val);
   editor->updateParameterButtons(idx); // ?
   switch (idx) {
@@ -221,6 +221,8 @@ void SalpaProcessor::createFitters(int nChannels) {
     if (tau + t_potblank > delay)
       delay = tau + t_potblank;
   }
+  //for (int c=0; c<nChannels; c++)
+  // inbufs[c]->donewriting(delay);
 }
 
 void SalpaProcessor::prepareToPlay(double sampleRate, int estimatedSamplesPerBlock) {
@@ -242,12 +244,16 @@ void SalpaProcessor::process(AudioSampleBuffer &buffer) {
     return;
   }
   int nSamples = getNumSamples(0);
+  //  printf("t0=%li inbuf@%li outbuf@%li\n", t0, inbufs[0]->latest(), outbufs[0]->latest());
 
   if (mustrebuild || nChannels != fitters.size()) {
     createFitters(nChannels);
     // this must be the first part of the run or parameters have changed
-    for (int c=0; c<nChannels; c++)
+    for (int c=0; c<nChannels; c++) {
+      inbufs[c]->reset(startTs);
+      outbufs[c]->reset(startTs);
       outbufs[c]->fill(v_zero);
+    }
     fitters[0]->inirep();
   }
 
