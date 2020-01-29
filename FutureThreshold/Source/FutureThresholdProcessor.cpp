@@ -182,7 +182,7 @@ void FutureThresholdProcessor::process(AudioSampleBuffer &buffer) {
     } else {
       if (sgn*val >= thr_trg) {
         // create trigger event
-        printf("TRIGGER %Li\n", startTs + i);
+        //printf("TRIGGER %Li\n", startTs + i);
         MetaDataValueArray mdArray;
         // MetaDataValue *mdv_time
         //   = new MetaDataValue(*eventMetaDataDescriptors[0]);

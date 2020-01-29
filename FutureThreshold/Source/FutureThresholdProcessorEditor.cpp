@@ -91,7 +91,7 @@ void FutureThresholdProcessorEditor::loadCustomParameters(XmlElement *xml) {
     printf("FUTURETHRESHOLDPROCESSOREDITOR - NO PROCESSOR\n");
     return;
   }
-  
+
   bool ok = false;
   forEachXmlChildElementWithTagName(*xml, mainNode, "VALUES") {
     auto loadParameter = [this, processor, mainNode](int idx) {
@@ -99,7 +99,7 @@ void FutureThresholdProcessorEditor::loadCustomParameters(XmlElement *xml) {
       return mainNode->getDoubleAttribute(parameter->getName());
     };
     ok = true;
-    
+
     int inpch = loadParameter(FutureThresholdProcessor::PARAM_INPUT_CHANNEL);
     if (inpch>=0)
       content.adcChannel->setValue(inpch+1);
@@ -116,7 +116,7 @@ void FutureThresholdProcessorEditor::loadCustomParameters(XmlElement *xml) {
 
     float rt = loadParameter(FutureThresholdProcessor::PARAM_RESET_THRESHOLD);
     content.resetThreshold->setValue(rt);
-    
+
     float fut = loadParameter(FutureThresholdProcessor::PARAM_DELAY_SAMPS);
     content.futureMS->setValue(fut);
   }
