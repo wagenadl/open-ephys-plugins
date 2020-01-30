@@ -306,6 +306,23 @@ void SalpaProcessor::process(AudioSampleBuffer &buffer) {
       samplePtr[n] = outbuf[t0 - delay + n];
   }
 
+  while (!futureEvents.empty()) {
+    auto evt = futureEvents.front();
+    if (evt.t < t0 + nSamples) {
+        MetaDataValueArray mdArray;
+        TTLEventPtr event = TTLEvent::createTTLEvent(eventChannelPtr,
+                                                        evt.t,
+                                                        &evt.v,
+                                                        sizeof(juce::uint8),
+                                                        mdArray,
+                                                        evt.c);
+        addEvent(eventChannelPtr, event, evt.t - t0);
+        futureEvents.pop();
+    } else {
+      break;
+    }
+  }
+
   //  fitters[0]->report();
 }
 
@@ -323,31 +340,8 @@ void SalpaProcessor::handleEvent(EventChannel const *eventInfo,
       forceends.push(t + t0 + t_potblank);
 
       if (eventChannelPtr) {
-        ch += 1;
-        // following may not be correct. tricky with delay.
-        MetaDataValueArray mdArray;
-        // MetaDataValue *mdv_time
-        //   = new MetaDataValue(*eventMetaDataDescriptors[0]);
-        // mdv_time->setValue(startTs + i);
-        // mdArray.add(mdv_time);
-        juce::uint8 ttlDataOn = 1<<ch;
-        juce::int64 eventTsOn = t + t0 + delay;
-        TTLEventPtr eventOn = TTLEvent::createTTLEvent(eventChannelPtr,
-                                                        eventTsOn,
-                                                        &ttlDataOn,
-                                                        sizeof(juce::uint8),
-                                                        mdArray,
-                                                        ch);
-        addEvent(eventChannelPtr, eventOn, t + delay);
-        juce::uint8 ttlDataOff = 0;
-        juce::int64 eventTsOff = t + t0 + t_potblank + delay;
-        TTLEventPtr eventOff = TTLEvent::createTTLEvent(eventChannelPtr,
-                                                        eventTsOff,
-                                                        &ttlDataOff,
-                                                        sizeof(juce::uint8),
-                                                        mdArray,
-                                                        ch);
-        addEvent(eventChannelPtr, eventOff, t + t_potblank + delay);
+        futureEvents.push(EventPrep{t0 + t + delay, 2<<ch, ch+1});
+        futureEvents.push(EventPrep{t0 + t + t_potblank + delay, 0, ch+1});
       }
     }
   }

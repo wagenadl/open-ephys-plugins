@@ -99,6 +99,12 @@ private:
   timeref_t t0;
   bool mustrebuild;
   EventChannel *eventChannelPtr;
+  struct EventPrep {
+    timeref_t t;
+    juce::uint8 v;
+    int c;
+  };
+  std::queue<EventPrep> futureEvents;
 private:
   void createFitters(int nChannels);
   void dropFitters();
