@@ -120,6 +120,7 @@ void FutureThresholdProcessor::setParameter(int parameterIndex,
 
 
 void FutureThresholdProcessor::createEventChannels() {
+  printf("FutureThreshold: createeventchannels\n");
   DataChannel const *in = getDataChannel(input_channel);
   if (!in) {
     eventChannelPtr = nullptr;
@@ -143,7 +144,7 @@ void FutureThresholdProcessor::process(AudioSampleBuffer &buffer) {
   if (input_channel < 0
       || input_channel >= buffer.getNumChannels()
       || !eventChannelPtr) {
-    printf("Cannot process\n");
+    printf("Cannot process %i %i %p\n", input_channel, buffer.getNumChannels(), eventChannelPtr);
     //    jassertfalse;
     return;
   }
@@ -182,7 +183,7 @@ void FutureThresholdProcessor::process(AudioSampleBuffer &buffer) {
     } else {
       if (sgn*val >= thr_trg) {
         // create trigger event
-        //printf("TRIGGER %Li\n", startTs + i);
+        printf("TRIGGER %Li\n", startTs + i);
         MetaDataValueArray mdArray;
         // MetaDataValue *mdv_time
         //   = new MetaDataValue(*eventMetaDataDescriptors[0]);
