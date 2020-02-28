@@ -424,6 +424,6 @@ void LocalFit::inirep() {
 	<< " rail2=" << rail2;
 }
 
-int LocalFit::requireddelay() const {
+int_t LocalFit::requireddelay() const {
   return 2*tau + t_ahead + t_chi2 + t_blankdepeg + 10;
 }

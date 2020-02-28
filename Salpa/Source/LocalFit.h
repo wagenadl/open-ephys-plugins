@@ -71,7 +71,7 @@ public:
   void setthreshold(raw_t thr);
   timeref_t process(timeref_t t_limit);
   timeref_t forcepeg(timeref_t t_from, timeref_t t_to);
-  int requireddelay() const;
+  int_t requireddelay() const;
 private:
   void init_T();
   void calc_X012(); // at t0

@@ -335,7 +335,7 @@ void SalpaProcessor::handleEvent(EventChannel const *eventInfo,
     int ch = ttl->getChannel();
     int t = samplePosition;
     //printf("Salpa: event id %i channel %i time %i / %i\n", id, ch, t, eventchannel);
-    if (id and ch==eventchannel) {
+    if (id && ch==eventchannel) {
       forcestarts.push(t + t0);
       forceends.push(t + t0 + t_potblank);
 
