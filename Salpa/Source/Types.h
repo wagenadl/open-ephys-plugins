@@ -22,55 +22,70 @@
 
 #define TYPES_H
 
-// Magic incantation to get 64-bit integers on most platforms
-// Inspired by mathworks's "io64.h" file.
-#if defined(__alpha) || defined(__sparcv9) || defined(__ia64) \
-    || defined(__ia64__) || defined(__x86_64__) || defined(__LP64__)
-  #define UINT64_DW unsigned long
-#elif defined(_MSC_VER) || (defined(__BORLANDC__) && __BORLANDC__ >= 0x530) \
-      || (defined(__WATCOMC__)  && __WATCOMC__  >= 1100)
-  #define UINT64_DW unsigned __int64
-#elif defined(__GNUC__) || defined(__hpux) || defined(__sun)
-  #define UINT64_DW unsigned long long
-#else
-  #define UINT64_DW unsigned long long
-#endif
+// // Magic incantation to get 64-bit integers on most platforms
+// // Inspired by mathworks's "io64.h" file.
+// #if defined(__alpha) || defined(__sparcv9) || defined(__ia64) \
+//     || defined(__ia64__) || defined(__x86_64__) || defined(__LP64__)
+//   #define UINT64_DW unsigned long
+// #elif defined(_MSC_VER) || (defined(__BORLANDC__) && __BORLANDC__ >= 0x530) \
+//       || (defined(__WATCOMC__)  && __WATCOMC__  >= 1100)
+//   #define UINT64_DW unsigned __int64
+// #elif defined(__GNUC__) || defined(__hpux) || defined(__sun)
+//   #define UINT64_DW unsigned long long
+// #else
+//   #define UINT64_DW unsigned long long
+// #endif
+// 
+// typedef UINT64_DW timeref_t;
 
-typedef UINT64_DW timeref_t;
+#include <cstdint>
+#include <sstream>
 
-// #include <stdint.h>
+typedef std::uint64_t timeref_t;
+constexpr timeref_t INFTY{~timeref_t(0)};
 
-// typedef uint64_t timeref_t;
-
-
-const timeref_t INFTY = (timeref_t)(-1);
+typedef std::int64_t int_t;
+typedef std::uint64_t uint_t;
 
 typedef float raw_t; //:t raw_t
 /*:D Type of raw data, i.e. single channel samples. */
 
-typedef float real_t; //:t real_t
+typedef double real_t; //:t real_t
 /*:D Representation for real numbers used throughout this software. */
 
-typedef unsigned char byte;
+typedef std::uint8_t byte;
 
-#include <stdio.h>
+#include <iostream>
+
+class Dbg {
+public:
+  Dbg() {
+  }
+  ~Dbg() {
+    std::cerr << str.str() << "\n";
+    std::cerr.flush();
+  }
+  template <class T> Dbg &operator<<(T const &t) { str << t; return *this; }
+private:
+  std::ostringstream str;
+};    
 
 class Error {
 public:
-  Error(char const *issuer0=0, char const *cause0=0) {
-    issuer=issuer0;
-    cause=cause0;
+  Error(char const *issuer0=0, char const *cause0=0):
+    issuer(issuer0), cause(cause0) {
   }
   virtual ~Error() {}
   void report(char const *src=0) const {
+    Dbg dbg;
     if (src)
-      fprintf(stderr,"%s: %s: %s\n",src,issuer?issuer:"",cause?cause:"");
-    else
-      fprintf(stderr,"%s: %s\n",issuer?issuer:"",cause?cause:"");
+      dbg << src << ": ";
+    dbg << issuer << ": ";
+    dbg << cause;
   }
 protected:
-  char const *issuer;
-  char const *cause;
+  std::string issuer;
+  std::string cause;
 };
 
 

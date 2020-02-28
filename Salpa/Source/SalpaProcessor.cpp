@@ -340,7 +340,8 @@ void SalpaProcessor::handleEvent(EventChannel const *eventInfo,
       forceends.push(t + t0 + t_potblank);
 
       if (eventChannelPtr) {
-        futureEvents.push(EventPrep{t0 + t + delay, 2<<ch, ch+1});
+	juce::uint8 chmsk = juce::uint8(2<<ch);
+        futureEvents.push(EventPrep{t0 + t + delay, chmsk, ch+1});
         futureEvents.push(EventPrep{t0 + t + t_potblank + delay, 0, ch+1});
       }
     }

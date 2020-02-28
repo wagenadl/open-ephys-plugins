@@ -4,10 +4,11 @@
 
 #define CIRCULARBUFFER_H
 
+#include <vector>
+
 class CircularBuffer {
 public:
   CircularBuffer(int logsize=12);
-  ~CircularBuffer();
   void reset(); // sets delay to zero
   void unget(int n);
   inline void put(float x) {
@@ -20,6 +21,7 @@ public:
     return x;
   }
 private:
+  std::vector<float> vec;
   int logsize;
   float *data;
   int readindex;
@@ -30,12 +32,11 @@ private:
 class CircularBuffers {
 public:
   CircularBuffers(int nChannels=512, int logsize=12);
-  ~CircularBuffers();
   void reset();
   void unget(int n);
-  inline CircularBuffer *channel(int c) { return buffers[c]; }
+  inline CircularBuffer &channel(int c) { return buffers[c]; }
 private:
-  CircularBuffer **buffers;
+  std::vector<CircularBuffer> buffers;
   int nchans;
   int logsize;
 };

@@ -208,10 +208,10 @@ void FutureThresholdProcessor::process(AudioSampleBuffer &buffer) {
     for (int c=0; c<nCh; c++) {
       float *rp = buffer.getWritePointer(c);
       int nSam = getNumSamples(c); //*/ buffer.getNumSamples();
-      CircularBuffer *buf = circbufs.channel(c);
+      CircularBuffer &buf = circbufs.channel(c);
       for (int n=0; n<nSam; n++) {
-        buf->put(rp[n]);
-        rp[n] = buf->get();
+        buf.put(rp[n]);
+        rp[n] = buf.get();
       }
     }
   }

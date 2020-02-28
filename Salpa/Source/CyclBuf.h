@@ -24,29 +24,30 @@
 
 #include "Types.h"
 #include <vector>
+#include <algorithm>
 
 template <class T> class CyclBuf {
 public:
-  CyclBuf(int logsiz0) {
-    logsiz = logsiz0;
-    vec.resize(1<<logsiz);
+  CyclBuf(uint_t logsiz0): logsiz(logsiz0) {
+    timeref_t siz = 1; siz <<= logsiz;
+    vec.resize(siz);
     data_ = vec.data();
     latest_ = 0;
-    mask = (1<<logsiz)-1;
+    mask = siz - 1;
   }
-  void fill(T t) { for (unsigned int k=0; k<=mask; k++) data_[k] = t; }
+  void fill(T t) { std::fill(vec.begin(), vec.end(), t); }
   timeref_t latest() const { return latest_; }
   T const &operator[](timeref_t t) const { return data_[t&mask]; }
   T &operator[](timeref_t t) { return data_[t&mask]; }
   T *wheretowrite() { return data_ + (latest_&mask); }
-  void donewriting(int n) { latest_ += n; }
+  void donewriting(int_t n) { latest_ += n; }
   void reset(timeref_t t=0) { latest_=t; }
 private:
   std::vector<T> vec;
   T *data_;
   timeref_t latest_;
-  unsigned int mask;
-  int logsiz;
+  timeref_t mask;
+  uint_t logsiz;
 };
 
 #endif

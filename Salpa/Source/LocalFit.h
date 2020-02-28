@@ -58,9 +58,9 @@ public:
   static constexpr timeref_t BLANKDEP=5; // samples
   static constexpr timeref_t AHEAD=5; // samples
   static constexpr timeref_t TOOPOORCNT=5;
-  typedef double int_t;
+  //  typedef double int_t;
   //  typedef long long int_t;
-  typedef double real_t;
+  // typedef double real_t;
 public: 
   LocalFit(CyclBuf<raw_t> const &source, CyclBuf<raw_t> &dest,
 	   timeref_t t_start, raw_t threshold, timeref_t tau,
@@ -89,10 +89,10 @@ private:
 private:
   // externally imposed constants
   raw_t y_threshold;
-  int tau;
-  int t_blankdepeg;
-  int t_ahead;
-  int t_chi2;
+  int_t tau;
+  int_t t_blankdepeg;
+  int_t t_ahead;
+  int_t t_chi2;
   raw_t rail1, rail2;
 private:
   // self computed constants
@@ -108,7 +108,7 @@ private:
   // state variables
   State state;
   timeref_t t_stream, t0;
-  int_t X0, X1, X2, X3;
+  real_t X0, X1, X2, X3;
   real_t alpha0, alpha1, alpha2, alpha3;
   int toopoorcnt;
   bool negv;
