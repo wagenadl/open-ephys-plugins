@@ -62,11 +62,8 @@ endif()
 
 #Libraries and compiler options
 if(MSVC)
-	set(GUI_BIN_DIR ${GUI_BASE_DIR}/Builds/VisualStudio2013)
-	if (CMAKE_LIBRARY_ARCHITECTURE STREQUAL "x64")
-		set(GUI_BIN_DIR ${GUI_BIN_DIR}/x64)
-	endif()
-	set(GUI_BIN_DIR ${GUI_BIN_DIR}/$<IF:$<CONFIG:Debug>,Debug,Release>/bin)
+	set(GUI_BIN_DIR ${GUI_BASE_DIR}/Build)
+	set(GUI_BIN_DIR ${GUI_BIN_DIR}/$<IF:$<CONFIG:Debug>,Debug,Release>)
 
 	target_link_libraries(${PLUGIN_NAME} ${GUI_BIN_DIR}/open-ephys.lib)
 	target_compile_options(${PLUGIN_NAME} PRIVATE /sdl-)
@@ -80,7 +77,8 @@ if(MSVC)
 	list(APPEND CMAKE_PREFIX_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../libs)
 
 elseif(LINUX)
-	set(GUI_BIN_DIR ${GUI_BASE_DIR}/Builds/Linux/build)
+	set(GUI_BIN_DIR ${GUI_BASE_DIR}/Build)
+	set(GUI_BIN_DIR ${GUI_BIN_DIR}/$<IF:$<CONFIG:Debug>,Debug,Release>)
 
 	target_link_libraries(${PLUGIN_NAME} GL X11 Xext Xinerama asound dl freetype pthread rt)
 	set_property(TARGET ${PLUGIN_NAME} APPEND_STRING PROPERTY LINK_FLAGS
@@ -99,8 +97,6 @@ elseif(APPLE)
 	set(CMAKE_PREFIX_PATH /opt/local)
 endif()
 
-# Following is for plugin-GUI compiled with CMake. Tested on Linux. - DAW
-set(GUI_BIN_DIR ${GUI_BASE_DIR}/Build/Debug)
 
 
 #create filters for vs and xcode
