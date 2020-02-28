@@ -69,7 +69,7 @@ FutureThresholdProcessorContentComponent::FutureThresholdProcessorContentCompone
     addAndMakeVisible (triggerThreshold = new Slider ("TriggerThreshold"));
     triggerThreshold->setTooltip (TRANS("Threshold for event detection"));
     triggerThreshold->setExplicitFocusOrder (3);
-    triggerThreshold->setRange (-32700, 32700, 100);
+    triggerThreshold->setRange (-32700, 32700, 1);
     triggerThreshold->setSliderStyle (Slider::LinearHorizontal);
     triggerThreshold->setTextBoxStyle (Slider::TextBoxLeft, false, 50, 20);
     triggerThreshold->addListener (this);
@@ -85,7 +85,7 @@ FutureThresholdProcessorContentComponent::FutureThresholdProcessorContentCompone
     addAndMakeVisible (resetThreshold = new Slider ("ResetThreshold"));
     resetThreshold->setTooltip (TRANS("Threshold for resetting the trigger"));
     resetThreshold->setExplicitFocusOrder (4);
-    resetThreshold->setRange (-32700, 32700, 100);
+    resetThreshold->setRange (-32700, 32700, 1);
     resetThreshold->setSliderStyle (Slider::LinearHorizontal);
     resetThreshold->setTextBoxStyle (Slider::TextBoxLeft, false, 50, 20);
     resetThreshold->addListener (this);
@@ -278,7 +278,7 @@ BEGIN_JUCER_METADATA
          bold="0" italic="0" justification="33"/>
   <SLIDER name="TriggerThreshold" id="48402addfc350acb" memberName="triggerThreshold"
           virtualName="" explicitFocusOrder="3" pos="20 25% 20M 20%" tooltip="Threshold for event detection"
-          min="-32700" max="32700" int="100" style="LinearHorizontal" textBoxPos="TextBoxLeft"
+          min="-32700" max="32700" int="1" style="LinearHorizontal" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="50" textBoxHeight="20" skewFactor="1"
           needsCallback="1"/>
   <LABEL name="new label" id="ce272e92d526a20f" memberName="label3" virtualName=""
@@ -288,7 +288,7 @@ BEGIN_JUCER_METADATA
          bold="0" italic="0" justification="33"/>
   <SLIDER name="ResetThreshold" id="386c9c0917432d48" memberName="resetThreshold"
           virtualName="" explicitFocusOrder="4" pos="20 50% 20M 20%" tooltip="Threshold for resetting the trigger"
-          min="-32700" max="32700" int="100" style="LinearHorizontal" textBoxPos="TextBoxLeft"
+          min="-32700" max="32700" int="1" style="LinearHorizontal" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="50" textBoxHeight="20" skewFactor="1"
           needsCallback="1"/>
   <LABEL name="new label" id="cfb0672dde7980dc" memberName="label4" virtualName=""
