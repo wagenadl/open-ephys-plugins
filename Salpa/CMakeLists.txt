@@ -62,7 +62,7 @@ endif()
 
 #Libraries and compiler options
 if(MSVC)
-	set(GUI_BIN_DIR ${GUI_BASE_DIR}/Build
+	set(GUI_BIN_DIR ${GUI_BASE_DIR}/Build)
 	set(GUI_BIN_DIR ${GUI_BIN_DIR}/$<IF:$<CONFIG:Debug>,Debug,Release>)
 
 	target_link_libraries(${PLUGIN_NAME} ${GUI_BIN_DIR}/open-ephys.lib)
