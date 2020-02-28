@@ -33,8 +33,8 @@
 // inline functions
 //
 inline void LocalFit::update_X012() {
-  raw_t y_new = source[t_stream+tau];
-  raw_t y_old = source[t_stream-tau-1];
+  real_t y_new = source[t_stream+tau];
+  real_t y_old = source[t_stream-tau-1];
   X0 += y_new - y_old;
   X1 += tau_plus_1*y_new - minus_tau*y_old - X0;
   X2 += tau_plus_1_squared*y_new - minus_tau_squared*y_old - X0 - 2*X1;
@@ -363,10 +363,9 @@ void LocalFit::calc_X3() {
 
 void LocalFit::update_X0123() {
   // based on calc dd 9/7/01 - do recheck!
-  raw_t y_new = source[t0+tau];
-  raw_t y_old = source[t0-tau-1];
-  X0 += y_new;
-  X0 -= y_old;
+  real_t y_new = source[t0+tau];
+  real_t y_old = source[t0-tau-1];
+  X0 += y_new - y_old;
   X1 += tau_plus_1*y_new - minus_tau*y_old - X0;
   X2 += tau_plus_1_squared*y_new - minus_tau_squared*y_old - X0 - 2*X1;
   X3 += tau_plus_1_cubed*y_new - minus_tau_cubed*y_old - X0 - 3*X1 - 3*X2;
