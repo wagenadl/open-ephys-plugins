@@ -89,9 +89,6 @@ AudioProcessorEditor* FutureThresholdProcessor::createEditor() {
 
 void FutureThresholdProcessor::setParameter(int parameterIndex,
                                             float newValue) {
-  GenericProcessor::setParameter (parameterIndex, newValue);
-  editor->updateParameterButtons (parameterIndex);
-
   switch (parameterIndex) {
   case PARAM_INPUT_CHANNEL:
     input_channel = newValue;
@@ -116,6 +113,8 @@ void FutureThresholdProcessor::setParameter(int parameterIndex,
     printf("delay = %i samples\n", future_samps);
     break;
   }
+  GenericProcessor::setParameter (parameterIndex, newValue);
+  editor->updateParameterButtons (parameterIndex);
 }
 
 
@@ -143,7 +142,7 @@ void FutureThresholdProcessor::process(AudioSampleBuffer &buffer) {
   if (input_channel < 0
       || input_channel >= buffer.getNumChannels()
       || !eventChannelPtr) {
-    printf("Cannot process\n");
+    std::cerr << "Cannot process: " << input_channel << " / " << buffer.getNumChannels() << " : " << eventChannelPtr << "\n";
     //    jassertfalse;
     return;
   }
