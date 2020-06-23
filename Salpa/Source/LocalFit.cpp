@@ -32,8 +32,8 @@
 // inline functions
 //
 inline void LocalFit::update_X012() {
-  int_t y_new = source[t_stream+tau];
-  int_t y_old = source[t_stream-tau-1];
+  real_t y_new = source[t_stream+tau];
+  real_t y_old = source[t_stream-tau-1];
   X0 += y_new - y_old;
   X1 += tau_plus_1*y_new - minus_tau*y_old - X0;
   X2 += tau_plus_1_squared*y_new - minus_tau_squared*y_old - X0 - 2*X1;
@@ -93,7 +93,7 @@ void LocalFit::init_T() {
   minus_tau_cubed = minus_tau_squared * minus_tau;
     
   T0=T2=T4=T6=0;
-  for (int t=-tau; t<=tau; t++) {
+  for (int_t t=-tau; t<=tau; t++) {
     int_t t2=t*t;
     int_t t4=t2*t2;
     int_t t6=t4*t2;
@@ -147,7 +147,7 @@ LocalFit::State LocalFit::statemachine(timeref_t t_limit, State s) {
     if (t_stream>=t_limit)
       return PEGGED;
     if (ispegged(source[t_stream])) {
-      dest[t_stream]=0;
+      dest[t_stream] = 0;
       t_stream++;
       goto l_PEGGED;
     }
@@ -172,11 +172,11 @@ LocalFit::State LocalFit::statemachine(timeref_t t_limit, State s) {
 #if ASYM_NOT_CHI2
     real_t asym=0;
     real_t sig=0;
-    for (int i=0; i<t_chi2; i++) {
-      int t_i = t_stream+i;
-      int dt = t_i - t0;
-      int dt2=dt*dt;
-      int dt3=dt*dt2;
+    for (int_t i=0; i<t_chi2; i++) {
+      timeref_t t_i = t_stream + i;
+      int_t dt = t_i - t0;
+      int_t dt2 = dt*dt;
+      int_t dt3 = dt*dt2;
       real_t dy = alpha0 + alpha1*dt + alpha2*dt2 + alpha3*dt3 - source[t_i];
       asym+=dy;
       sig+=dy*dy;
@@ -184,39 +184,41 @@ LocalFit::State LocalFit::statemachine(timeref_t t_limit, State s) {
     //    fprintf(stderr,"TOOPOOR: t=%.2f t0=%.2f asym/sqrt(t)=%g [t_chi2=%i sqrt(sig/t)=%g]\n",
     //	    t_stream/25.,t0/25.,asym/sqrt(t_chi2+0.),t_chi2,sqrt(sig/t_chi2));
     //    fprintf(stderr,"    alpha = %g  %g  %g  %g\n",alpha0,alpha1,alpha2,alpha3);
-    asym*=asym;
+    asym *= asym;
     if (asym<my_thresh)
       toopoorcnt--;
     else
-      toopoorcnt=TOOPOORCNT;
+      toopoorcnt = TOOPOORCNT;
     if (toopoorcnt<=0 && asym < my_thresh/3.92) {
       if (usenegv) {
         int dt = t_stream - t0;
-        int dt2=dt*dt;
-        int dt3=dt*dt2;
-        negv =  source[t_stream] < raw_t(alpha0 + alpha1*dt + alpha2*dt2 + alpha3*dt3);
+        int dt2 = dt*dt;
+        int dt3 = dt*dt2;
+        negv = source[t_stream]
+          < raw_t(alpha0 + alpha1*dt + alpha2*dt2 + alpha3*dt3);
       }
       calc_X012(); calc_X3(); // for numerical stability problem!
       goto l_BLANKDEPEG;
     }
 #else // ASYM_NOT_CHI2 is false
     real_t chi2=0;
-    for (int i=0; i<t_chi2; i++) {
-      int t_i = t_stream+t_blankdepeg+i;
-      int dt = t_i - t0;
-      int dt2=dt*dt;
-      int dt3=dt*dt2;
+    for (int_t i=0; i<t_chi2; i++) {
+      timeref_t t_i = t_stream+t_blankdepeg+i;
+      int_t dt = t_i - t0;
+      int_t dt2 = dt*dt;
+      int_t dt3 = dt*dt2;
       real_t dy = alpha0 + alpha1*dt + alpha2*dt2 + alpha3*dt3 - source[t_i];
-      chi2+=dy*dy;
+      chi2 + =dy*dy;
     }
     ////    fprintf(stderr,"TOOPOOR: chi2=%g [%2f-%2f]\n",chi2,
     ////	    (t_stream+t_blankdepeg)/25.,(t_stream+t_blankdepeg+TOOPOORCNT)/25.);
     if (chi2 < my_thresh) {
       if (usenegv) {
         int dt = t_stream - t0;
-        int dt2= dt*dt;
-        int dt3= dt*dt2;
-        negv = source[t_stream] < raw_t(alpha0 + alpha1*dt + alpha2*dt2 + alpha3*dt3);
+        int dt2 = dt*dt;
+        int dt3 = dt*dt2;
+        negv = source[t_stream]
+          < raw_t(alpha0 + alpha1*dt + alpha2*dt2 + alpha3*dt3);
       }
       goto l_BLANKDEPEG;
     }
@@ -224,10 +226,10 @@ LocalFit::State LocalFit::statemachine(timeref_t t_limit, State s) {
 
 //    int dt=t_stream-t0; int dt2=dt*dt; int dt3=dt*dt2;
 //    dest[t_stream]=source[t_stream]-int(alpha0 + alpha1*dt + alpha2*dt2 + alpha3*dt3);
-    dest[t_stream]=0;
+    dest[t_stream] = 0;
     t_stream++; t0++;
     if (ispegged(source[t0+tau])) {
-      t0=t0+tau;
+      t0 = t0 + tau;
       goto l_FORCEPEG;
     }
     update_X0123();
@@ -244,7 +246,7 @@ LocalFit::State LocalFit::statemachine(timeref_t t_limit, State s) {
       return FORCEPEG;
     if (t_stream>=t0)
       goto l_PEGGED;
-    dest[t_stream]=0;
+    dest[t_stream] = 0;
     t_stream++;
     goto l_FORCEPEG;
   }
@@ -254,14 +256,14 @@ LocalFit::State LocalFit::statemachine(timeref_t t_limit, State s) {
 //////////////////////////////////////////////////
  l_BLANKDEPEG: {
     //printf("BLANKDEPEG %Li %Li %Li\n", t_stream, t_limit, t0 - tau + t_blankdepeg);
-    if (t_stream>=t_limit)
+    if (t_stream >= t_limit)
       return BLANKDEPEG;
-    if (t_stream >= t0-tau+t_blankdepeg)
+    if (t_stream >= t0 - tau + t_blankdepeg)
       goto l_DEPEGGING;
     if (usenegv) {
-      int dt=t_stream-t0;
-      int dt2=dt*dt;
-      int dt3=dt*dt2;
+      int dt = t_stream - t0;
+      int dt2 = dt*dt;
+      int dt3 = dt*dt2;
       raw_t y = source[t_stream]
         - raw_t(alpha0 + alpha1*dt + alpha2*dt2 + alpha3*dt3);
       if ((y<0) != negv) {
@@ -271,7 +273,7 @@ LocalFit::State LocalFit::statemachine(timeref_t t_limit, State s) {
     dest[t_stream] = 0;
     t_stream++;
     if (ispegged(source[t_stream+tau+t_ahead])) {
-      t0=t_stream-1;
+      t0 = t_stream-1;
       calc_X3();
       calc_alpha0123();
       goto l_PEGGING;
@@ -286,14 +288,14 @@ LocalFit::State LocalFit::statemachine(timeref_t t_limit, State s) {
 
 //////////////////////////////////////////////////
  l_DEPEGGING: {
-    if (t_stream>=t_limit)
+    if (t_stream >= t_limit)
       return DEPEGGING;
-    if (t_stream>=t0) {
+    if (t_stream >= t0) {
       goto l_OK;
     }
-    int dt=t_stream-t0;
-    int dt2=dt*dt;
-    int dt3=dt*dt2;
+    int_t dt = t_stream-t0;
+    int_t dt2 = dt*dt;
+    int_t dt3 = dt*dt2;
     dest[t_stream] = source[t_stream]
       - raw_t(alpha0 + alpha1*dt + alpha2*dt2 + alpha3*dt3);
     t_stream++;
@@ -310,9 +312,9 @@ LocalFit::State LocalFit::statemachine(timeref_t t_limit, State s) {
       t_peg = t_stream;
       goto l_PEGGED;
     }
-    int dt=t_stream-t0;
-    int dt2=dt*dt;
-    int dt3=dt*dt2;
+    int_t dt = t_stream-t0;
+    int_t dt2=dt*dt;
+    int_t dt3=dt*dt2;
     dest[t_stream] = source[t_stream]
       - raw_t(alpha0 + alpha1*dt + alpha2*dt2 + alpha3*dt3);
     t_stream++;
@@ -344,29 +346,29 @@ LocalFit::State LocalFit::statemachine(timeref_t t_limit, State s) {
 }
 
 void LocalFit::calc_X012() {
-  X0=X1=X2=0;
-  for (int t=-tau; t<=tau; t++) {
-    int_t t2=t*t;
-    int_t y=source[t0+t];
-    X0+=y;
-    X1+=t*y;
-    X2+=t2*y;
+  X0 = X1 = X2 = 0;
+  for (int_t t=-tau; t<=tau; t++) {
+    int_t t2 = t*t;
+    real_t y = source[t0+t];
+    X0 += y;
+    X1 += t*y;
+    X2 += t2*y;
   }
 }
 
 void LocalFit::calc_X3() {
-  X3=0;
-  for (int t=-tau; t<=tau; t++) {
-    int_t t3=t*t*t;
-    int_t y=source[t0+t];
-    X3+=t3*y;
+  X3 = 0;
+  for (int_t t=-tau; t<=tau; t++) {
+    int_t t3 = t*t*t;
+    real_t y = source[t0+t];
+    X3 += t3*y;
   }
 }
 
 void LocalFit::update_X0123() {
   // based on calc dd 9/7/01 - do recheck!
-  int_t y_new = source[t0+tau];
-  int_t y_old = source[t0-tau-1];
+  real_t y_new = source[t0+tau];
+  real_t y_old = source[t0-tau-1];
   X0 += y_new - y_old;
   X1 += tau_plus_1*y_new - minus_tau*y_old - X0;
   X2 += tau_plus_1_squared*y_new - minus_tau_squared*y_old - X0 - 2*X1;
@@ -390,43 +392,41 @@ void LocalFit::calc_alpha0123() {
 //--------------------------------------------------------------------
 // debug
 //
-#include <stdio.h>
 
 void LocalFit::report() {
-  fprintf(stderr,"state=%8s ",
-	  state==OK?"OK":
-	  state==PEGGING?"PEGGING":
-	  state==PEGGED?"PEGGED":
-	  state==TOOPOOR?"TOOPOOR":
-	  state==DEPEGGING?"DEPEGGING":
-	  state==FORCEPEG?"FORCEPEG":
-          state==BLANKDEPEG?"BLANKDEP":
-	  "???");
-  std::cerr << " t_stream=" << t_stream;
-  std::cerr << " t0=" << t0;
-  std::cerr << " y[ts]=" << source[t_stream];
-  std::cerr << " alpha=" << alpha0 << " " << alpha1
-            << " " << alpha2 << " " << alpha3;
-  std::cerr << " X=" << X0 << " " << X1
-            << " " << X2 << " " << X3;
-  std::cerr << " y_thr=" << y_threshold;
-  std::cerr << " my_thr=" << my_thresh;
-  std::cerr << "\n";
+  Dbg() << "state = "
+	<< (state==OK?"OK":
+	    state==PEGGING?"PEGGING":
+	    state==PEGGED?"PEGGED":
+	    state==TOOPOOR?"TOOPOOR":
+	    state==DEPEGGING?"DEPEGGING":
+	    state==FORCEPEG?"FORCEPEG":
+	    state==BLANKDEPEG?"BLANKDEP":
+	    "???")
+	<< " t_stream=" << t_stream 
+	<< " t0=" << t0
+	<< " y[ts]=" << source[t_stream]
+	<< " alpha=" << alpha0 << " " << alpha1
+	<< " " << alpha2 << " " << alpha3
+	<< " X=" << X0 << " " << X1
+	<< " " << X2 << " " << X3
+	<< " y_thr=" << y_threshold
+	<< " my_thr=" << my_thresh;
 }
 
 void LocalFit::inirep() {
-  std::cerr << "tau=" << tau;
-  std::cerr << " T0=" << T0;
-  std::cerr << " T2=" << T2;
-  std::cerr << " T4=" << T4;
-  std::cerr << " T6=" << T6;
-  std::cerr << " t_blank=" << t_blankdepeg;
-  std::cerr << " t_ahead=" << t_ahead;
-  std::cerr << " t_chi2=" << t_chi2;
-  std::cerr << " rail1=" << rail1;
-  std::cerr << " rail2=" << rail2;
+  Dbg() << "tau=" << tau
+	<< " T0=" << T0
+	<< " T2=" << T2
+	<< " T4=" << T4
+	<< " T6=" << T6
+	<< " t_blank=" << t_blankdepeg
+	<< " t_ahead=" << t_ahead
+	<< " t_chi2=" << t_chi2
+	<< " rail1=" << rail1
+	<< " rail2=" << rail2;
 }
 
-int LocalFit::requireddelay() const {
+int_t LocalFit::requireddelay() const {
   return 2*tau + t_ahead + t_chi2 + t_blankdepeg + 10;
 }

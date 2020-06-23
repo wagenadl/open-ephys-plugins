@@ -1,22 +1,20 @@
 // CircularBuffer.cpp
 
 #include "CircularBuffer.h"
+#include <algorithm>
 
 CircularBuffer::CircularBuffer(int logsize):
   logsize(logsize) {
-  data = new float[1<<logsize];
-  mask = (1<<logsize) - 1;
+  int size = 1<<logsize;
+  vec.resize(size);
+  data = vec.data();
+  mask = size - 1;
   reset();
 }
 
 void CircularBuffer::reset() {
   readindex = writeindex = 0;
-  for (int k=0; k<(1<<logsize); k++)
-    data[k] = 0;
-}
-
-CircularBuffer::~CircularBuffer() {
-  delete [] data;
+  std::fill(vec.begin(), vec.end(), 0);
 }
 
 void CircularBuffer::unget(int n) {
@@ -27,25 +25,18 @@ void CircularBuffer::unget(int n) {
 }
 
 CircularBuffers::CircularBuffers(int nchans, int logsize): nchans(nchans), logsize(logsize) {
-  buffers = new CircularBuffer *[nchans];
   for (int c=0; c<nchans; c++)
-    buffers[c] = new CircularBuffer(logsize);
-}
-
-CircularBuffers::~CircularBuffers() {
-  for (int c=0; c<nchans; c++)
-    delete buffers[c];
-  delete [] buffers;
+    buffers.push_back(CircularBuffer(logsize));
 }
 
 void CircularBuffers::reset() {
   for (int c=0; c<nchans; c++)
-    buffers[c]->reset();
+    buffers[c].reset();
 }
 
 void CircularBuffers::unget(int n) {
   for (int c=0; c<nchans; c++)
-    buffers[c]->unget(n);
+    buffers[c].unget(n);
 }
 
   

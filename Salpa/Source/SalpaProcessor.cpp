@@ -367,12 +367,13 @@ void SalpaProcessor::handleEvent(EventChannel const *eventInfo,
     int ch = ttl->getChannel();
     int t = samplePosition;
     //printf("Salpa: event id %i channel %i time %i / %i\n", id, ch, t, eventchannel);
-    if (id and ch==eventchannel) {
+    if (id && ch==eventchannel) {
       forcestarts.push(t + t0);
       forceends.push(t + t0 + t_potblank);
 
       if (eventChannelPtr) {
-        futureEvents.push(EventPrep{t0 + t + delay, 2<<ch, ch+1});
+	juce::uint8 chmsk = juce::uint8(2<<ch);
+        futureEvents.push(EventPrep{t0 + t + delay, chmsk, ch+1});
         futureEvents.push(EventPrep{t0 + t + t_potblank + delay, 0, ch+1});
       }
     }

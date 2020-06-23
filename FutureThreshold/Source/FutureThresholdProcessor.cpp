@@ -119,6 +119,7 @@ void FutureThresholdProcessor::setParameter(int parameterIndex,
 
 
 void FutureThresholdProcessor::createEventChannels() {
+  printf("FutureThreshold: createeventchannels\n");
   DataChannel const *in = getDataChannel(input_channel);
   if (!in) {
     eventChannelPtr = nullptr;
@@ -181,7 +182,7 @@ void FutureThresholdProcessor::process(AudioSampleBuffer &buffer) {
     } else {
       if (sgn*val >= thr_trg) {
         // create trigger event
-        //printf("TRIGGER %Li\n", startTs + i);
+        printf("TRIGGER %Li\n", startTs + i);
         MetaDataValueArray mdArray;
         // MetaDataValue *mdv_time
         //   = new MetaDataValue(*eventMetaDataDescriptors[0]);
@@ -206,10 +207,10 @@ void FutureThresholdProcessor::process(AudioSampleBuffer &buffer) {
     for (int c=0; c<nCh; c++) {
       float *rp = buffer.getWritePointer(c);
       int nSam = getNumSamples(c); //*/ buffer.getNumSamples();
-      CircularBuffer *buf = circbufs.channel(c);
+      CircularBuffer &buf = circbufs.channel(c);
       for (int n=0; n<nSam; n++) {
-        buf->put(rp[n]);
-        rp[n] = buf->get();
+        buf.put(rp[n]);
+        rp[n] = buf.get();
       }
     }
   }
