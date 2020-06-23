@@ -25,6 +25,8 @@
 #ifndef SALPAPROCESSOR_H_INCLUDED
 #define SALPAPROCESSOR_H_INCLUDED
 
+#include "TaskQueue.h"
+
 #ifdef _WIN32
 #include <Windows.h>
 #endif
@@ -105,6 +107,7 @@ private:
     int c;
   };
   std::queue<EventPrep> futureEvents;
+  TaskQueue<std::packaged_task<void()>> threadpool;
 private:
   void createFitters(int nChannels);
   void dropFitters();

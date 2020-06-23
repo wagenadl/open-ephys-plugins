@@ -31,6 +31,7 @@
 const int FREQKHZ = 30; // whatever
 const int TRAINCHUNKS = 20;
 const int LOGBUFSIZE = 12; // BUFSIZE = 1<<12 = 4096 samples
+const int NTHREADS = 8; // or 16
 
 SalpaProcessor::SalpaProcessor(): GenericProcessor("SALPA"),
                                   v_zero(0),
@@ -44,7 +45,8 @@ SalpaProcessor::SalpaProcessor(): GenericProcessor("SALPA"),
                                   absthr(0),
                                   relthr(3.5),
                                   eventchannel(-1),
-                                  delay(0) {
+                                  delay(0),
+                                  threadpool(NTHREADS) {
   eventChannelPtr = 0;
   setProcessorType (PROCESSOR_TYPE_FILTER);
 
@@ -177,7 +179,7 @@ void SalpaProcessor::train(AudioSampleBuffer &buffer) {
     noise.makeready();
     //for (int n=0; n<fitters.size(); n++)
     //  printf("noise[%i] = %g\n", n, noise.std(n));
-    if (!useabsthr)
+    if (!useabsthr || absthr==0)
       for (int n=0; n<fitters.size(); n++)
         fitters[n]->setthreshold(relthr * noise.std(n));
   } else {
@@ -216,7 +218,7 @@ void SalpaProcessor::createFitters(int nChannels) {
                               t_blankdur, t_ahead,
                               t_asym);
     fitters[c]->setrail(v_neg_rail, v_pos_rail);
-    fitters[c]->setthreshold(useabsthr ? absthr : relthr * noise.std(c));
+    fitters[c]->setthreshold((useabsthr && absthr>0) ? absthr : relthr * noise.std(c));
     delay = fitters[c]->requireddelay(); // will be all the same
     if (tau + t_potblank > delay)
       delay = tau + t_potblank;
@@ -272,6 +274,10 @@ void SalpaProcessor::process(AudioSampleBuffer &buffer) {
   else
     tlim -= delay;
 
+  int step = nChannels / NTHREADS;
+  if (step*NTHREADS < nChannels)
+    step++;
+
   if (eventchannel >= 0) {
     while (!forcestarts.empty()) {
       timeref_t tfrom = forcestarts.front();
@@ -279,13 +285,31 @@ void SalpaProcessor::process(AudioSampleBuffer &buffer) {
       //printf("forcepeg %li - %li [%li - %li]\n",
       //     tfrom, tto, t0, tlim);
       if (tto <= tlim) {
-        for (int c=0; c<nChannels; c++)
-          fitters[c]->forcepeg(tfrom, tto);
+        for (int c0=0; c0<nChannels; c0+=step) {
+          int c1 = c0 + step;
+          if (c1>nChannels)
+            c1 = nChannels;
+          std::packaged_task<void()> task([c0, c1, tfrom, tto, this]() {
+                                            for (int c=c0; c<c1; c++)
+                                              fitters[c]->forcepeg(tfrom, tto);
+                                          });
+          threadpool.post(task);
+        }
+        threadpool.wait();
         forcestarts.pop();
         forceends.pop();
       } else if (tfrom < tlim) {
-        for (int c=0; c<nChannels; c++)
-          fitters[c]->forcepeg(tfrom, tlim);
+        for (int c0=0; c0<nChannels; c0+=step) {
+          int c1 = c0 + step;
+          if (c1>nChannels)
+            c1 = nChannels;
+          std::packaged_task<void()> task([c0, c1, tfrom, tlim, this]() {
+                                            for (int c=c0; c<c1; c++)
+                                              fitters[c]->forcepeg(tfrom, tlim);
+                                          });
+          threadpool.post(task);
+        }
+        threadpool.wait();
         forcestarts.front() = tlim;
         // leave some of the forced peg to next cycle
         break;
@@ -295,9 +319,17 @@ void SalpaProcessor::process(AudioSampleBuffer &buffer) {
       }
     }
   }
-
-  for (int c=0; c<nChannels; c++)
-    fitters[c]->process(tlim);
+  for (int c0=0; c0<nChannels; c0+=step) {
+    int c1 = c0 + step;
+    if (c1>nChannels)
+      c1 = nChannels;
+    std::packaged_task<void()> task([c0, c1, tlim, this]() {
+                                      for (int c=c0; c<c1; c++)
+                                              fitters[c]->process(tlim);
+                                    });
+    threadpool.post(task);
+  }
+  threadpool.wait();
 
   for (int c=0; c<nChannels; c++) {
     float *samplePtr = buffer.getWritePointer(c, 0);
