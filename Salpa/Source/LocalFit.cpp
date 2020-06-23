@@ -25,7 +25,6 @@
 #ifndef THIRDORDER
 #define THIRDORDER 1
 #endif
-#define PREMATURE 0
 
 #include <math.h>
 
@@ -56,10 +55,15 @@ LocalFit::LocalFit(CyclBuf<raw_t> const &source0,
   source(source0), dest(dest0), y_threshold(threshold0), tau(tau0),
   t_blankdepeg(t_blankdepeg0), t_ahead(t_ahead0), t_chi2(t_chi20) {
   state = PEGGED;
+  usenegv = false;
   t_peg = t_stream = t_start;
   init_T();
   setthreshold(threshold0);
   setrail(RAIL1, RAIL2);
+}
+
+void LocalFit::setusenegv(bool t) {
+  usenegv = t;
 }
 
 void LocalFit::reset(timeref_t t_start) {
@@ -185,14 +189,14 @@ LocalFit::State LocalFit::statemachine(timeref_t t_limit, State s) {
       toopoorcnt--;
     else
       toopoorcnt = TOOPOORCNT;
-    if (toopoorcnt <= 0 && asym < my_thresh/3.92) {
-#if PREMATURE
-      int_t dt = t_stream - t0;
-      int_t dt2 = dt*dt;
-      int_t dt3 = dt*dt2;
-      negv = source[t_stream]
-	< raw_t(alpha0 + alpha1*dt + alpha2*dt2 + alpha3*dt3);
-#endif // PREMATURE
+    if (toopoorcnt<=0 && asym < my_thresh/3.92) {
+      if (usenegv) {
+        int dt = t_stream - t0;
+        int dt2 = dt*dt;
+        int dt3 = dt*dt2;
+        negv = source[t_stream]
+          < raw_t(alpha0 + alpha1*dt + alpha2*dt2 + alpha3*dt3);
+      }
       calc_X012(); calc_X3(); // for numerical stability problem!
       goto l_BLANKDEPEG;
     }
@@ -209,13 +213,13 @@ LocalFit::State LocalFit::statemachine(timeref_t t_limit, State s) {
     ////    fprintf(stderr,"TOOPOOR: chi2=%g [%2f-%2f]\n",chi2,
     ////	    (t_stream+t_blankdepeg)/25.,(t_stream+t_blankdepeg+TOOPOORCNT)/25.);
     if (chi2 < my_thresh) {
-#if PREMATURE
-      int_t dt = t_stream - t0;
-      int_t dt2 = dt*dt;
-      int_t dt3 = dt*dt2;
-      negv = source[t_stream]
-	< raw_t(alpha0 + alpha1*dt + alpha2*dt2 + alpha3*dt3);
-#endif // PREMATURE
+      if (usenegv) {
+        int dt = t_stream - t0;
+        int dt2 = dt*dt;
+        int dt3 = dt*dt2;
+        negv = source[t_stream]
+          < raw_t(alpha0 + alpha1*dt + alpha2*dt2 + alpha3*dt3);
+      }
       goto l_BLANKDEPEG;
     }
 #endif // ASYM_NOT_CHI2
@@ -256,16 +260,16 @@ LocalFit::State LocalFit::statemachine(timeref_t t_limit, State s) {
       return BLANKDEPEG;
     if (t_stream >= t0 - tau + t_blankdepeg)
       goto l_DEPEGGING;
-#if PREMATURE
-    timeref_t dt = t_stream-t0;
-    int_t dt2=dt*dt;
-    int_t dt3=dt*dt2;
-    raw_t y = source[t_stream]
-      - raw_t(alpha0 + alpha1*dt + alpha2*dt2 + alpha3*dt3);
-    if ((y<0) != negv) {
-      goto l_DEPEGGING;
+    if (usenegv) {
+      int dt = t_stream - t0;
+      int dt2 = dt*dt;
+      int dt3 = dt*dt2;
+      raw_t y = source[t_stream]
+        - raw_t(alpha0 + alpha1*dt + alpha2*dt2 + alpha3*dt3);
+      if ((y<0) != negv) {
+        goto l_DEPEGGING;
+      }
     }
-#endif
     dest[t_stream] = 0;
     t_stream++;
     if (ispegged(source[t_stream+tau+t_ahead])) {

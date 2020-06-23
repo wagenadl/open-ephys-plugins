@@ -68,6 +68,7 @@ public:
 	   timeref_t t_chi2=TCHI2);
   void reset(timeref_t t_start);
   void setrail(raw_t r1, raw_t r2);
+  void setusenegv(bool);
   void setthreshold(raw_t thr);
   timeref_t process(timeref_t t_limit);
   timeref_t forcepeg(timeref_t t_from, timeref_t t_to);
@@ -94,6 +95,7 @@ private:
   int_t t_ahead;
   int_t t_chi2;
   raw_t rail1, rail2;
+  bool usenegv;
 private:
   // self computed constants
   int_t tau_plus_1;
