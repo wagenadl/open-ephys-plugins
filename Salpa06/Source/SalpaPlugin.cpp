@@ -1,8 +1,8 @@
 /*
 ------------------------------------------------------------------
 
-This file is part of the Open Ephys GUI
-Copyright (C) 2022 Open Ephys
+This file is part of the SALPA plugin to Open Ephys GUI
+Copyright (C) 2022 Daniel Wagenaar
 
 ------------------------------------------------------------------
 
@@ -20,39 +20,39 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "ProcessorPlugin.h"
+#include "SalpaPlugin.h"
 
-#include "ProcessorPluginEditor.h"
+#include "SalpaPluginEditor.h"
 
 
-ProcessorPlugin::ProcessorPlugin()
-    : GenericProcessor("Plugin Name")
+SalpaPlugin::SalpaPlugin()
+    : GenericProcessor("SALPA")
 {
 
 }
 
 
-ProcessorPlugin::~ProcessorPlugin()
+SalpaPlugin::~SalpaPlugin()
 {
 
 }
 
 
-AudioProcessorEditor* ProcessorPlugin::createEditor()
+AudioProcessorEditor* SalpaPlugin::createEditor()
 {
-    editor = std::make_unique<ProcessorPluginEditor>(this);
+    editor = std::make_unique<SalpaPluginEditor>(this);
     return editor.get();
 }
 
 
-void ProcessorPlugin::updateSettings()
+void SalpaPlugin::updateSettings()
 {
 
 
 }
 
 
-void ProcessorPlugin::process(AudioBuffer<float>& buffer)
+void SalpaPlugin::process(AudioBuffer<float>& buffer)
 {
 
     checkForEvents(true);
@@ -60,31 +60,31 @@ void ProcessorPlugin::process(AudioBuffer<float>& buffer)
 }
 
 
-void ProcessorPlugin::handleTTLEvent(TTLEventPtr event)
+void SalpaPlugin::handleTTLEvent(TTLEventPtr event)
 {
 
 }
 
 
-void ProcessorPlugin::handleSpike(SpikePtr event)
+void SalpaPlugin::handleSpike(SpikePtr event)
 {
 
 }
 
 
-void ProcessorPlugin::handleBroadcastMessage(String message)
+void SalpaPlugin::handleBroadcastMessage(String message)
 {
 
 }
 
 
-void ProcessorPlugin::saveCustomParametersToXml(XmlElement* parentElement)
+void SalpaPlugin::saveCustomParametersToXml(XmlElement* parentElement)
 {
 
 }
 
 
-void ProcessorPlugin::loadCustomParametersFromXml(XmlElement* parentElement)
+void SalpaPlugin::loadCustomParametersFromXml(XmlElement* parentElement)
 {
 
 }

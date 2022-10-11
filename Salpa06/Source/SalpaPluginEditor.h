@@ -1,8 +1,8 @@
 /*
 ------------------------------------------------------------------
 
-This file is part of the Open Ephys GUI
-Copyright (C) 2022 Open Ephys
+This file is part of the SALPA plugin to Open Ephys GUI
+Copyright (C) 2022 Daniel Wagenaar
 
 ------------------------------------------------------------------
 
@@ -25,20 +25,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <EditorHeaders.h>
 
-class ProcessorPluginEditor : public GenericEditor
+class SalpaPluginEditor : public GenericEditor
 {
 public:
 
 	/** Constructor */
-	ProcessorPluginEditor(GenericProcessor* parentNode);
+	SalpaPluginEditor(GenericProcessor* parentNode);
 
 	/** Destructor */
-	~ProcessorPluginEditor() { }
+	~SalpaPluginEditor() { }
 
 private:
 
 	/** Generates an assertion if this class leaks */
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ProcessorPluginEditor);
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SalpaPluginEditor);
 };
 
 #endif // PROCESSORPLUGINEDITOR_H_DEFINED

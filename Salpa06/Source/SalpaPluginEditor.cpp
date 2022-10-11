@@ -1,8 +1,8 @@
 /*
 ------------------------------------------------------------------
 
-This file is part of the Open Ephys GUI
-Copyright (C) 2022 Open Ephys
+This file is part of the SALPA plugin to Open Ephys GUI
+Copyright (C) 2022 Daniel Wagenaar
 
 ------------------------------------------------------------------
 
@@ -20,9 +20,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "ProcessorPluginEditor.h"
+#include "SalpaPluginEditor.h"
 
-ProcessorPluginEditor::ProcessorPluginEditor(GenericProcessor* parentNode) 
+SalpaPluginEditor::SalpaPluginEditor(GenericProcessor* parentNode) 
     : GenericEditor(parentNode)
 {
 

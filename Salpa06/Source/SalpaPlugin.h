@@ -1,8 +1,8 @@
 /*
 ------------------------------------------------------------------
 
-This file is part of the Open Ephys GUI
-Copyright (C) 2022 Open Ephys
+This file is part of the SALPA plugin to Open Ephys GUI
+Copyright (C) 2022 Daniel Wagenaar
 
 ------------------------------------------------------------------
 
@@ -26,14 +26,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <ProcessorHeaders.h>
 
 
-class ProcessorPlugin : public GenericProcessor
+class SalpaPlugin : public GenericProcessor
 {
 public:
 	/** The class constructor, used to initialize any members. */
-	ProcessorPlugin();
+	SalpaPlugin();
 
 	/** The class destructor, used to deallocate memory */
-	~ProcessorPlugin();
+	~SalpaPlugin();
 
 	/** If the processor has a custom editor, this method must be defined to instantiate it. */
 	AudioProcessorEditor* createEditor() override;
