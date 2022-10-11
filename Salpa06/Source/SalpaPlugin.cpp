@@ -25,66 +25,44 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "SalpaPluginEditor.h"
 
 
-SalpaPlugin::SalpaPlugin()
-    : GenericProcessor("SALPA")
-{
-
+SalpaPlugin::SalpaPlugin(): GenericProcessor("SALPA") {
 }
 
 
-SalpaPlugin::~SalpaPlugin()
-{
-
+SalpaPlugin::~SalpaPlugin() {
 }
 
 
-AudioProcessorEditor* SalpaPlugin::createEditor()
-{
-    editor = std::make_unique<SalpaPluginEditor>(this);
-    return editor.get();
+AudioProcessorEditor* SalpaPlugin::createEditor() {
+  editor = std::make_unique<SalpaPluginEditor>(this);
+  return editor.get();
 }
 
 
-void SalpaPlugin::updateSettings()
-{
-
-
+void SalpaPlugin::updateSettings() {
 }
 
 
-void SalpaPlugin::process(AudioBuffer<float>& buffer)
-{
-
+void SalpaPlugin::process(AudioBuffer<float>& buffer) {
     checkForEvents(true);
-
 }
 
 
-void SalpaPlugin::handleTTLEvent(TTLEventPtr event)
-{
-
+void SalpaPlugin::handleTTLEvent(TTLEventPtr event) {
 }
 
 
-void SalpaPlugin::handleSpike(SpikePtr event)
-{
-
+void SalpaPlugin::handleSpike(SpikePtr event) {
 }
 
 
-void SalpaPlugin::handleBroadcastMessage(String message)
-{
-
+void SalpaPlugin::handleBroadcastMessage(String message) {
 }
 
 
-void SalpaPlugin::saveCustomParametersToXml(XmlElement* parentElement)
-{
-
+void SalpaPlugin::saveCustomParametersToXml(XmlElement* parentElement) {
 }
 
 
-void SalpaPlugin::loadCustomParametersFromXml(XmlElement* parentElement)
-{
-
+void SalpaPlugin::loadCustomParametersFromXml(XmlElement* parentElement) {
 }

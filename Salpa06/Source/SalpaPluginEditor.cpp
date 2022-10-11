@@ -22,10 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "SalpaPluginEditor.h"
 
-SalpaPluginEditor::SalpaPluginEditor(GenericProcessor* parentNode) 
-    : GenericEditor(parentNode)
-{
-
+SalpaPluginEditor::SalpaPluginEditor(GenericProcessor* parentNode):
+  GenericEditor(parentNode) {
     desiredWidth = 150;
-
 }
