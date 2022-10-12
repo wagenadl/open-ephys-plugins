@@ -25,20 +25,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <EditorHeaders.h>
 
-class SalpaPluginEditor : public GenericEditor
-{
+class SalpaPluginEditor: public GenericEditor {
 public:
-
-	/** Constructor */
-	SalpaPluginEditor(GenericProcessor* parentNode);
-
-	/** Destructor */
-	~SalpaPluginEditor() { }
-
+  /** Constructor */
+  SalpaPluginEditor(GenericProcessor* parentNode);
+  
+  /** Destructor */
+  ~SalpaPluginEditor();
 private:
-
-	/** Generates an assertion if this class leaks */
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SalpaPluginEditor);
+  /** Generates an assertion if this class leaks */
+  JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SalpaPluginEditor);
 };
 
 #endif // PROCESSORPLUGINEDITOR_H_DEFINED

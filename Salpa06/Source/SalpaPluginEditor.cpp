@@ -24,5 +24,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 SalpaPluginEditor::SalpaPluginEditor(GenericProcessor* parentNode):
   GenericEditor(parentNode) {
-    desiredWidth = 150;
+  desiredWidth = 450;
+  addTextBoxParameterEditor("V_NEG_RAIL", 10, 22);
+  addTextBoxParameterEditor("V_POS_RAIL", 10, 62);
+  // plenty more
+}
+
+SalpaPluginEditor::~SalpaPluginEditor() {
 }

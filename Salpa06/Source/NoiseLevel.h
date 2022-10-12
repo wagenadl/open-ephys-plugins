@@ -26,70 +26,54 @@
 
 #include <math.h>
 #include <vector>
-#include <ProcessorHeaders.h>
 
-class NoiseLevels {
+
+class NoiseLevel {
 public:
   static const int MINCHUNKS=5;
 public:
-  NoiseLevels() { reset(); }
-  float mean(int hw) const { return ready ? means[hw] : 0; }
-  float var(int hw) const { return ready ? vars[hw] : 1; }
-  float std(int hw) const { return ready ? stds[hw] : 1; }
-  float operator[](int hw) const { return std(hw); }
+  NoiseLevel() { reset(); }
+  float mean() const { return ready ? means : 0; }
+  float var() const { return ready ? vars : 1; }
+  float std() const { return ready ? stds : 1; }
   void reset() {
-    mv.clear();
+    mv.reset();
     ready=false;
   }
   void setnotready() {
     ready=false;
   }
-  void train(AudioSampleBuffer &buffer, int nSamples) {
-    int nChannels = buffer.getNumChannels();
-    if (nChannels != mv.size()) {
-      mv.resize(nChannels);
-      for (int c=0; c<nChannels; c++)
-        mv[c].reset();
-    }
-    for (int c=0; c<nChannels; c++) {
-      float const *samplePtr = buffer.getReadPointer(c, 0);
-      MedianVariance<double> &mv1(mv[c]);
-      for (int i=0; i<nSamples; i++)
-        mv1.addexample(samplePtr[i]);
-    }
+  void train(float const *samplePtr, int nSamples) {
+    for (int i=0; i<nSamples; i++)
+      mv.addexample(samplePtr[i]);
   }
   bool makeready()  {
     if (chunks() < MINCHUNKS) {
       printf("NoiseLevels: Too few chunks to compute meaningful estimates\n");
       return false;
     }
-    means.resize(mv.size());
-    vars.resize(mv.size());
-    stds.resize(mv.size());
-    for (int hw=0; hw<mv.size(); hw++) {
-      means[hw]=mv[hw].mean();
-      vars[hw]=mv[hw].var();
-      stds[hw]=sqrt(vars[hw]);
-    }
+    means=mv.mean();
+    vars=mv.var();
+    stds=sqrt(vars);
     ready=true;
     return true;
   }
   void force(int hw, double mean, double var) {
-    means[hw]=mean; vars[hw]=var; stds[hw]=sqrt(var);
+    means=mean; vars=var; stds=sqrt(var);
     ready=true;
   }
-  int chunks() const { return mv[0].chunks(); }
+  int chunks() const { return mv.chunks(); }
   void cleanout() {
-    for (int hw=0; hw<mv.size(); hw++)
-      mv[hw].reset();
+    mv.reset();
   }
   bool isready() const { return ready; }
 private:
-  std::vector<MedianVariance<double>> mv;
-  std::vector<float> means;
-  std::vector<float> vars;
-  std::vector<float> stds;
+  MedianVariance<float> mv;
+  float means;
+  float vars;
+  float stds;
   bool ready;
 };
 
 #endif
+

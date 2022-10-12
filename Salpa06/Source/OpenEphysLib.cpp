@@ -21,7 +21,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <PluginInfo.h>
-
 #include "SalpaPlugin.h"
 #include <string>
 
@@ -57,7 +56,7 @@ extern "C" EXPORT int getPluginInfo(int index, Plugin::PluginInfo* info)
 		info->type = Plugin::Type::PROCESSOR;
 
 		//Processor name
-		info->processor.name = "Plugin Name"; //Processor name shown in the GUI
+		info->processor.name = "SALPA"; //Processor name shown in the GUI
 
 		//Type of processor. Can be FILTER, SOURCE, SINK or UTILITY. Specifies where on the processor list will appear
 		info->processor.type = Processor::Type::FILTER;
