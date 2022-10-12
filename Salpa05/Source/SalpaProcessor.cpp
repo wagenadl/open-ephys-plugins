@@ -254,6 +254,7 @@ void SalpaProcessor::process(AudioSampleBuffer &buffer) {
     for (int c=0; c<nChannels; c++) {
       inbufs[c]->reset(startTs);
       outbufs[c]->reset(startTs);
+      fitters[c]->reset(startTs);
       outbufs[c]->fill(v_zero);
     }
     fitters[0]->inirep();
