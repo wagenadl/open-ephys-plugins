@@ -21,7 +21,7 @@ class SalpaModule {
 public:
   struct OutputEvent {
     EventChannel *channelptr;
-    int64 time;
+    timeref_t time;
     int line;
     int state;
     int64 reltime;
@@ -29,6 +29,7 @@ public:
 public:
   SalpaModule();
   ~SalpaModule();
+  void debugParams();
 public:
   void createFitters(int64 startsample);
   void dropFitters();
@@ -72,14 +73,12 @@ private:
   int delay;
   std::queue<timeref_t> forcestarts;
   std::queue<timeref_t> forceends;
-  timeref_t t0;
   struct EventPrep {
     timeref_t time;
     int state;
   };
   std::queue<EventPrep> futureEvents;
   TaskQueue<std::packaged_task<void()>> threadpool;
-
 };
 
 #endif

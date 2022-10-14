@@ -19,6 +19,18 @@ SalpaModule::SalpaModule(): v_zero(0),
 SalpaModule::~SalpaModule() {
 }
 
+void SalpaModule::debugParams() {
+  std::cerr << "SalpaModule::DebugParams\n";
+  bool first = true;
+  for (auto &f: fitters) {
+    if (first) {
+      (f.second)->inirep();
+      (f.second)->report();
+      first = false;
+    }
+  }
+}
+
 void SalpaModule::createFitters(int64 startsample) {
   dropFitters();
   delay = 0;
@@ -37,6 +49,7 @@ void SalpaModule::createFitters(int64 startsample) {
       fitters[c]->setthreshold((useabsthr && absthr>0)
                                ? absthr
                                : relthr * noise[c].std());
+      fitters[c]->reset(startsample);
       delay = fitters[c]->requireddelay(); // will be all the same
       if (tau + t_potblank > delay)
         delay = tau + t_potblank;
@@ -53,14 +66,18 @@ std::list<SalpaModule::OutputEvent> SalpaModule::process(
   
   if (!noiseready)
     train(buffer, nsamples);
-  if (fitters.empty()) 
+  
+  if (fitters.empty()) {
     createFitters(startsample);
+    // debugParams();
+  }
 
+  timeref_t t0 = 0; // will be overwritten
   for (auto const &group: groupedchannels) {
     for (uint16 c: group) {
       float const *samplePtr = buffer.getReadPointer(c);
       CyclBuf<raw_t> &inbuf(*inbufs[c]);
-      timeref_t t0 = inbuf.latest();
+      t0 = inbuf.latest();
       for (int n=0; n<nsamples; n++)
         inbuf[t0+n] = samplePtr[n];
       inbuf.donewriting(nsamples);
@@ -111,7 +128,7 @@ std::list<SalpaModule::OutputEvent> SalpaModule::process(
 
   for (auto const &group: groupedchannels) {
     std::packaged_task<void()> task([group, tlim, this]() {
-      for (int c: group)
+      for (int c: group) 
         fitters[c]->process(tlim);
     });
     threadpool.post(task);
@@ -150,9 +167,11 @@ void SalpaModule::train(AudioBuffer<float> &buffer, uint32 nsamples) {
         if (!noiseready)
           printf("SALPA: done training\n");
         noise[c].makeready();
-        noiseready = true; // this ought to be automatically true for all
         if (!useabsthr || absthr==0)
           fitters[c]->setthreshold(relthr * noise[c].std());
+        if (!noiseready)
+          fitters[c]->report();
+        noiseready = true; // this ought to be automatically true for all
       } else {
         //      printf("SALPA: more training required (%i)\n", noise.chunks());
       }

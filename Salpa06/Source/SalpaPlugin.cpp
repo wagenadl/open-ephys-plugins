@@ -39,7 +39,7 @@ SalpaPlugin::SalpaPlugin(): GenericProcessor("SALPA") {
   addparam("RELTHR", 1, 100, 3);  
   addparam("ABSTHR", 0, 32700, 0);  
   addBooleanParameter(Parameter::STREAM_SCOPE, "USEABSTHR", "x", false, false);
-  addparam("T_ASYM", 0, 1000, 0);  
+  addparam("T_ASYM", 0, 1000, 5);  
   addparam("EVENTCHANNEL", -1, 7, 0);  
   addparam("V_ZERO", -32700, 32700, 0);  
 }
@@ -54,7 +54,8 @@ AudioProcessorEditor* SalpaPlugin::createEditor() {
   return editor.get();
 }
 
-bool SalpaPlugin::startAcquisition() { 
+bool SalpaPlugin::startAcquisition() {
+  std::cerr << "SalpaPlugin::startAcquisition\n";
   for (auto stream: getDataStreams()) {
     if ((*stream)["enable_stream"]) {
       SalpaModule *module = modules[stream->getStreamId()];
@@ -142,6 +143,7 @@ void SalpaPlugin::parameterValueChanged(Parameter *param) {
     modules[stream]->eventchannel = value;
   else if (name.equalsIgnoreCase("V_ZERO"))
     modules[stream]->v_zero = value;
+  modules[stream]->dropFitters();
 
 }
   
