@@ -27,21 +27,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 SalpaPlugin::SalpaPlugin(): GenericProcessor("SALPA") {
   auto addparam = [this](char const *name, int min, int max, int dflt) {
-    addIntParameter(Parameter::STREAM_SCOPE, name, "x", dflt, min, max, false);
+    addIntParameter(Parameter::STREAM_SCOPE, name, name, "x", dflt, min, max, false);
   };
-  addparam("V_NEG_RAIL", -32767, -1, -3000);
-  addparam("V_POS_RAIL", 1, 32767, 3000);  
-  addparam("T_POTBLANK", 1, 100, 15);  
-  addparam("T_BLANKDUR", 1, 100, 5);  
-  addparam("N_TOOPOOR", 0, 100, 5);  
-  addparam("T_AHEAD", 0, 100, 5);  
-  addparam("TAU", 1, 1000, 30);  
-  addparam("RELTHR", 1, 100, 3);  
-  addparam("ABSTHR", 0, 32700, 0);  
-  addBooleanParameter(Parameter::STREAM_SCOPE, "USEABSTHR", "x", false, false);
-  addparam("T_ASYM", 0, 1000, 5);  
-  addparam("EVENTCHANNEL", -1, 7, 0);  
-  addparam("V_ZERO", -32700, 32700, 0);  
+  addparam("V_neg_rail", -32767, -1, -3000);
+  addparam("V_pos_rail", 1, 32767, 3000);  
+  addparam("T_pot_blank", 1, 100, 15);  
+  addparam("T_blank_dur", 1, 100, 5);  
+  addparam("N_too_poor", 0, 100, 5);  
+  addparam("T_ahead", 0, 100, 5);  
+  addparam("Tau", 1, 1000, 30);  
+  addFloatParameter(Parameter::STREAM_SCOPE, "RelThr", "RelThr", "x", "", 3. ,1., 10., .5);  
+  addparam("AbsThr", 0, 32700, 0);  
+  addBooleanParameter(Parameter::STREAM_SCOPE, "UseAbsThr", "Use abs thr", "x", false, false);
+  addparam("T_asym", 0, 1000, 5);  
+  addparam("EventChannel", -1, 7, 0);  
+  addparam("V_zero", -32700, 32700, 0);  
 }
 
 
@@ -85,18 +85,18 @@ void SalpaPlugin::updateSettings() {
     const uint16 streamId = stream->getStreamId();
     SalpaModule *module = modules[streamId];
     module->updateSettings(streamId, continuousChannels);
-    parameterValueChanged(stream->getParameter("V_NEG_RAIL"));
-    parameterValueChanged(stream->getParameter("V_POS_RAIL"));
-    parameterValueChanged(stream->getParameter("T_POTBLANK"));
-    parameterValueChanged(stream->getParameter("T_BLANKDUR"));
-    parameterValueChanged(stream->getParameter("N_TOOPOOR"));
-    parameterValueChanged(stream->getParameter("T_AHEAD"));
-    parameterValueChanged(stream->getParameter("TAU"));
-    parameterValueChanged(stream->getParameter("RELTHR"));
-    parameterValueChanged(stream->getParameter("ABSTHR"));
-    parameterValueChanged(stream->getParameter("T_ASYM"));
-    parameterValueChanged(stream->getParameter("EVENTCHANNEL"));
-    parameterValueChanged(stream->getParameter("V_ZERO"));
+    parameterValueChanged(stream->getParameter("V_neg_rail"));
+    parameterValueChanged(stream->getParameter("V_pos_rail"));
+    parameterValueChanged(stream->getParameter("T_pot_blank"));
+    parameterValueChanged(stream->getParameter("T_blank_dur"));
+    parameterValueChanged(stream->getParameter("N_too_poor"));
+    parameterValueChanged(stream->getParameter("T_ahead"));
+    parameterValueChanged(stream->getParameter("Tau"));
+    parameterValueChanged(stream->getParameter("RelThr"));
+    parameterValueChanged(stream->getParameter("AbsThr"));
+    parameterValueChanged(stream->getParameter("T_asym"));
+    parameterValueChanged(stream->getParameter("EventChannel"));
+    parameterValueChanged(stream->getParameter("V_zero"));
 
     EventChannel::Settings s{
       EventChannel::Type::TTL,
@@ -107,7 +107,7 @@ void SalpaPlugin::updateSettings() {
     };
 
     eventChannels.add(new EventChannel(s));
-    eventChannels.getLast()->addProcessor(processorInfo.get());
+    eventChannels.getLast()->addProcessor(this);
     modules[streamId]->outputEventChannel = eventChannels.getLast();
   }
 
@@ -121,11 +121,11 @@ void SalpaPlugin::parameterValueChanged(Parameter *param) {
     modules[stream]->v_neg_rail = value;
   else if (name.equalsIgnoreCase("V_POS_RAIL"))
     modules[stream]->v_pos_rail = value;
-  else if (name.equalsIgnoreCase("T_POTBLANK"))
+  else if (name.equalsIgnoreCase("T_POT_BLANK"))
     modules[stream]->t_potblank = value;
-  else if (name.equalsIgnoreCase("T_BLANKDUR"))
+  else if (name.equalsIgnoreCase("T_BLANK_DUR"))
     modules[stream]->t_blankdur = value;
-  else if (name.equalsIgnoreCase("N_TOOPOOR"))
+  else if (name.equalsIgnoreCase("N_TOO_POOR"))
     modules[stream]->n_toopoor = value;
   else if (name.equalsIgnoreCase("T_AHEAD"))
     modules[stream]->t_ahead = value;
@@ -184,7 +184,7 @@ void SalpaPlugin::handleSpike(SpikePtr event) {
 }
 
 
-void SalpaPlugin::handleBroadcastMessage(String message) {
+void SalpaPlugin::handleBroadcastMessage(String const &message, int64 const systime) {
 }
 
 

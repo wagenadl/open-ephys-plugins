@@ -149,7 +149,7 @@ std::list<SalpaModule::OutputEvent> SalpaModule::process(
     if (evt.time < t0 + nsamples) {
       result.push_back(OutputEvent{outputEventChannel, evt.time,
                                    eventchannel, evt.state,
-                                   evt.time - startsample});
+                                   int64(evt.time) - startsample});
       futureEvents.pop();
     } else {
       break;
@@ -246,8 +246,8 @@ void SalpaModule::handleEvent(int channel, bool state, int64 time) {
     forcestarts.push(time);
     forceends.push(time + t_potblank);
     if (outputEventChannel) {
-      futureEvents.push(EventPrep{time + delay, true});
-      futureEvents.push(EventPrep{time + t_potblank + delay, false});
+      futureEvents.push(EventPrep{timeref_t(time) + delay, true});
+      futureEvents.push(EventPrep{timeref_t(time) + t_potblank + delay, false});
     }
   }
 }

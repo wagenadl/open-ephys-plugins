@@ -81,8 +81,8 @@ private:
   Variance<D> col;
   std::vector<D> means;
   std::vector<D> vars;
-  int chunksize;
-  int i;
+  int chunksize = 1;
+  int i = 0;
 };
 
 #endif

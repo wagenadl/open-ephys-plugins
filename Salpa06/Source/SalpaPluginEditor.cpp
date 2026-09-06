@@ -24,28 +24,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 SalpaPluginEditor::SalpaPluginEditor(GenericProcessor* parentNode):
   GenericEditor(parentNode) {
-  desiredWidth = 550;
   constexpr int x0 = 10;
-  constexpr int dx = 100;
-  constexpr int y0 = 20;
-  constexpr int dy = 34;
-  addTextBoxParameterEditor("V_NEG_RAIL", x0, y0);
-  addTextBoxParameterEditor("V_POS_RAIL", x0, y0+dy);
-  addTextBoxParameterEditor("V_ZERO",     x0, y0+2*dy);
+  constexpr int dx = 180;
+  constexpr int y0 = 25;
+  constexpr int dy = 20;
+  desiredWidth = 3*dx;
+  addBoundedValueParameterEditor(Parameter::STREAM_SCOPE, "V_neg_rail", x0, y0);
+  addBoundedValueParameterEditor(Parameter::STREAM_SCOPE, "V_pos_rail", x0, y0+dy);
+  addBoundedValueParameterEditor(Parameter::STREAM_SCOPE, "V_zero",     x0, y0+2*dy);
+  addBoundedValueParameterEditor(Parameter::STREAM_SCOPE, "RelThr",     x0, y0+3*dy);
+  addBoundedValueParameterEditor(Parameter::STREAM_SCOPE, "AbsThr",     x0, y0+4*dy);
 
-  addTextBoxParameterEditor("T_POTBLANK", x0+dx, y0);
-  addTextBoxParameterEditor("T_BLANKDUR", x0+dx, y0+dy);
-  addTextBoxParameterEditor("T_AHEAD",    x0+dx, y0+2*dy);
+  addBoundedValueParameterEditor(Parameter::STREAM_SCOPE, "Tau",        x0+dx, y0);
+  addBoundedValueParameterEditor(Parameter::STREAM_SCOPE, "T_pot_blank", x0+dx, y0+dy);
+  addBoundedValueParameterEditor(Parameter::STREAM_SCOPE, "T_blank_dur", x0+dx, y0+2*dy);
+  addBoundedValueParameterEditor(Parameter::STREAM_SCOPE, "T_ahead",    x0+dx, y0+3*dy);
+  addBoundedValueParameterEditor(Parameter::STREAM_SCOPE, "T_asym",     x0+dx, y0+4*dy);
 
-  addTextBoxParameterEditor("RELTHR",     x0+2*dx, y0);
-  addTextBoxParameterEditor("ABSTHR",     x0+2*dx, y0+dy);
-  addTextBoxParameterEditor("USEABSTHR", x0+2*dx, y0+2*dy);
+  addToggleParameterEditor(Parameter::STREAM_SCOPE, "UseAbsThr",        x0+2*dx, y0);
+  addBoundedValueParameterEditor(Parameter::STREAM_SCOPE, "N_too_poor",  x0+2*dx, y0+dy);
+  addComboBoxParameterEditor(Parameter::STREAM_SCOPE, "EventChannel",   x0+2*dx, y0+2*dy);
 
-  addTextBoxParameterEditor("TAU",           x0+3*dx, y0);
-  addTextBoxParameterEditor("N_TOOPOOR",     x0+3*dx, y0+dy);
-  addComboBoxParameterEditor("EVENTCHANNEL", x0+3*dx, y0+2*dy);
-
-  addTextBoxParameterEditor("T_ASYM",           x0+4*dx, y0);
 }
 
 SalpaPluginEditor::~SalpaPluginEditor() {
